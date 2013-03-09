@@ -1,0 +1,37 @@
+####################################
+# Build, Release, and Temp Folders
+####################################
+bin/
+bin-debug/
+bin-release/
+tmp/
+obj/
+raw-assets/
+.settings/
+
+####################################################################################
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
+####################################################################################
+
+##############################
+# SublimeText project files
+##############################
+*.sublime-workspace
+*.sublime-project
+
+############
+## Windows
+############
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+############
+## Mac
+#############
+.DS_Store
