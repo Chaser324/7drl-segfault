@@ -4,9 +4,9 @@
 bin/
 bin-debug/
 bin-release/
-tmp/
+tmp/*
 obj/
-raw-assets/
+raw-assets/*
 .settings/
 
 ####################################################################################

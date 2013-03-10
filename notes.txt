@@ -1,0 +1,27 @@
+# Sprites
+
+16x16 sprites => 2x Scaled to 32x32
+
+# Map Generation
+
+## Map Elements
+
+@ = Player
+
+# = Empty
+f = Floor
+w = Wall
+W = Solid Wall (no door allowed)
+d = Door Open
+D = Door Closed
+
+S = Stairs Up
+s = Stairs Down
+
+c = Chest (closed)
+C = Chest (open)
+
+E = Enemy
+
+
+
