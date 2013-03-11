@@ -1,5 +1,6 @@
 package com.cp.sf.entities.rooms 
 {
+	import com.cp.sf.Utils;
 	import net.flashpunk.Entity;
 	/**
 	 * ...
@@ -7,11 +8,24 @@ package com.cp.sf.entities.rooms
 	 */
 	public class Room extends Entity
 	{
+		// The number of the cell assigned to this room
+		public var cell_num:int;
+		
+		// The map cooridinates of this room's origin (top left cell)
+		public var mapX:int;
+		public var mapY:int;
+		
 		protected var layout:Array;
 		
 		public function Room() 
 		{
 			super();
+		}
+		
+		public function get leftConnectPoint():Array
+		{
+			var retVal:Array = [ 0, Utils.randomRange(1, this.roomHeight - 2) ];
+			return retVal;
 		}
 		
 		public function get roomLayout():Array

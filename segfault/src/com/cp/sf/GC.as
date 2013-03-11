@@ -33,6 +33,7 @@ package com.cp.sf
 		/**
 		 * DIRECTIONS
 		 */
+		public static const DIR_NULL:int = -1;
 		public static const DIR_UP:int = 0;
 		public static const DIR_DOWN:int = 1;
 		public static const DIR_LEFT:int = 2;
