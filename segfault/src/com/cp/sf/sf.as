@@ -34,6 +34,7 @@ package com.cp.sf
 			//FP.console.enable();
 
 			FP.screen.scale = 1;
+			FP.screen.color = 0x000000;
 
 			Data.prefix = "ChasePettit";
 			Data.id = "segfault-roguelike";

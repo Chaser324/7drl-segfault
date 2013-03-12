@@ -5,9 +5,11 @@ package com.cp.sf
 	 */
 	public final class GFX 
 	{
-		//[Embed(source = "../../../../assets/gfx/player-spritesheet.png")]
-		//public static const GFX_PLAYER:Class;
+		[Embed(source="../../../../assets/terrain.png")]
+		public static const GFX_TERRAIN:Class;
 		
+		[Embed(source = "../../../../assets/player.png")]
+		public static const GFX_PLAYER:Class;
 	}
 
 }

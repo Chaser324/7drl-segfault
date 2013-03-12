@@ -2,9 +2,12 @@ package com.cp.sf.entities
 {
 	import com.cp.sf.entities.rooms.Room;
 	import com.cp.sf.entities.rooms.SmallOffice;
+	import com.cp.sf.entities.terrain.Floor;
+	import com.cp.sf.entities.terrain.Wall;
 	import com.cp.sf.GC;
 	import com.cp.sf.Utils;
 	import net.flashpunk.Entity;
+	import net.flashpunk.FP;
 	
 	/**
 	 * ...
@@ -18,6 +21,10 @@ package com.cp.sf.entities
 		
 		protected var rooms:Array;
 		protected var sortedRooms:Array;
+		protected var firstRoom:Room;
+		protected var lastRoom:Room;
+		
+		protected var terrainEntities:Array;		
 		
 		// Number of blocks in height/width of a cell of room grid
 		protected var cell_height:int;
@@ -26,6 +33,8 @@ package com.cp.sf.entities
 		// Number of cells in each column/row of room grid
 		protected var grid_height:int;
 		protected var grid_width:int;
+		
+		protected var playerStartPos:MapPoint;
 		
 		protected static const GRID_BUFFER:int = 1;
 		protected static const CELL_BUFFER:int = 4;
@@ -46,7 +55,46 @@ package com.cp.sf.entities
 			placeRooms();
 			buildConnections();
 			addWalls();
-			traceMap();
+			drawMap();
+			placePlayer();
+			//traceMap();
+		}
+		
+		private function drawMap():void
+		{
+			terrainEntities = new Array(this.mapHeight);
+			for (var row:int = 0; row < layout.length; row++)
+			{
+				terrainEntities[row] = new Array(this.mapWidth);
+				for (var col:int = 0; col < layout[row].length; col++)
+				{
+					var cell:String = getCell(col, row);
+					
+					if (cell == GC.MAP_WALL)
+					{
+						terrainEntities[row][col] = new Wall(col, row);
+						FP.world.add(terrainEntities[row][col]);
+					}
+					else if (cell == GC.MAP_FLOOR || cell == GC.MAP_HALLWAY)
+					{
+						terrainEntities[row][col] = new Floor(col, row);
+						FP.world.add(terrainEntities[row][col]);
+					}
+				}
+			}
+		}
+		
+		private function placePlayer():void
+		{
+			var tile:String = "";
+			playerStartPos = new MapPoint();
+			
+			while (tile != GC.MAP_FLOOR)
+			{
+				playerStartPos.x = firstRoom.mapX + Utils.randomRange(0, firstRoom.roomWidth - 1);
+				playerStartPos.y = firstRoom.mapY + Utils.randomRange(0, firstRoom.roomHeight - 1);
+				tile = getCell(playerStartPos.x, playerStartPos.y);
+			}
 		}
 		
 		private function addWalls():void
@@ -105,6 +153,7 @@ package com.cp.sf.entities
 			
 			// Start with a random room
 			var curRoom:Room = rooms[Utils.randomRange(0, rooms.length - 1)];
+			firstRoom = curRoom;
 			curRoom.connected = true;
 			
 			while (getUnconnectedNeighbors(curRoom).length > 0)
@@ -115,6 +164,7 @@ package com.cp.sf.entities
 				connectRooms(curRoom, sortedRooms[neighborIndex]);
 				curRoom = sortedRooms[neighborIndex];
 				curRoom.connected = true;
+				lastRoom = curRoom;
 			}
 			
 			// Get an array of all rooms still unconnected.
@@ -137,6 +187,7 @@ package com.cp.sf.entities
 					
 					connectRooms(r, sortedRooms[neighborIndex]);
 					r.connected = true;
+					lastRoom = r;
 				}
 				
 				unconnectedRooms = new Array();
@@ -416,12 +467,20 @@ package com.cp.sf.entities
 			this.layout[cellY] = curRow.substr(0,cellX) + data + curRow.substr(cellX + 1);
 		}
 		
-		private function getCell(cellX:int, cellY:int):String
+		public function getCell(cellX:int, cellY:int):String
 		{
 			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
 				return null
 			
 			return String(layout[cellY]).charAt(cellX);
+		}
+		
+		public function getCellObject(cellX:int, cellY:int):Object
+		{
+			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
+				return null
+			
+			return terrainEntities[cellY][cellX];
 		}
 		
 		private function generateEmptyMap():void
@@ -449,6 +508,11 @@ package com.cp.sf.entities
 			{
 				trace(String(this.layout[i]));
 			}
+		}
+		
+		public function get playerStartPosition():MapPoint
+		{
+			return playerStartPos;
 		}
 		
 	}
