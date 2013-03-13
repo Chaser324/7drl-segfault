@@ -1,7 +1,11 @@
 package com.cp.sf.worlds 
 {
 	import com.cp.sf.entities.Map;
+	import com.cp.sf.entities.MapPoint;
 	import com.cp.sf.entities.Player;
+	import com.cp.sf.entities.ui.GameUI;
+	import com.cp.sf.entities.ui.Minimap;
+	import com.cp.sf.FOV;
 	import com.cp.sf.GC;
 	import net.flashpunk.FP;
 	import net.flashpunk.World;
@@ -14,9 +18,13 @@ package com.cp.sf.worlds
 	{
 		protected var map:Map;
 		protected var player:Player;
+		protected var ui:GameUI;
+		protected var minimap:Minimap;
 		
 		protected var cameraVX:Number = 0;
 		protected var cameraVY:Number = 0;
+		
+		protected var lighting:FOV;
 		
 		public function GameWorld() 
 		{
@@ -25,11 +33,21 @@ package com.cp.sf.worlds
 		
 		override public function begin():void
 		{
+			ui = new GameUI();
+			this.add(ui);
+			
 			map = new Map();
 			this.add(map);
 			
 			player = new Player(map.playerStartPosition.x, map.playerStartPosition.y);
 			this.add(player);
+			
+			minimap = new Minimap(map.mapHeight,map.mapWidth);
+			this.add(minimap);
+			minimap.visible = false;
+			
+			lighting = new FOV(map.terrainEntities);
+			lighting.compute(player.mapX, player.mapY);
 			
 			super.begin();
 		}
@@ -41,47 +59,26 @@ package com.cp.sf.worlds
 			super.update();
 		}
 		
+		public function updatePlayerPosition(x:int, y:int):void
+		{			
+			lighting.compute(x, y);
+			minimap.updatePlayerPosition(new MapPoint(x, y));
+		}
+		
 		public function getMapTerrain(mapX:int, mapY:int):Object
 		{
 			return this.map.getCellObject(mapX, mapY);
 		}
 		
+		public function revealMinimap(mapX:int, mapY:int, tile:String):void
+		{
+			minimap.revealCell(new MapPoint(mapX, mapY, tile));
+		}
+		
 		private function followPlayer():void
 		{
-			FP.camera.x = (player.x + player.width / 2) - FP.width / 2;
+			FP.camera.x = (player.x + player.width / 2) - FP.width / 1.6;
 			FP.camera.y = (player.y + player.height / 2) - FP.height / 2;
-			
-			//if (player.x - FP.camera.x < GC.CAMERA_OFFSET)
-			//{
-				//cameraVX -= GC.CAMERA_SPEED;
-			//}
-			//else if ((FP.camera.x + FP.width) - (player.x + player.width) < GC.CAMERA_OFFSET)
-			//{
-				//cameraVX += GC.CAMERA_SPEED;
-			//}
-			//else
-			//{
-				//cameraVX *= GC.CAMERA_FRICTION;
-			//}
-			//
-			//if (player.y - FP.camera.y < GC.CAMERA_OFFSET)
-			//{
-				//cameraVY -= GC.CAMERA_SPEED;
-			//}
-			//else if ((FP.camera.y + FP.height) - (player.y + player.height) < GC.CAMERA_OFFSET)
-			//{
-				//cameraVY += GC.CAMERA_SPEED;
-			//}
-			//else
-			//{
-				//cameraVY *= GC.CAMERA_FRICTION;
-			//}
-			//
-			//cameraVX = FP.clamp(cameraVX, -GC.PLAYER_MAX_SPEED, GC.PLAYER_MAX_SPEED);
-			//cameraVY = FP.clamp(cameraVY, -GC.PLAYER_MAX_SPEED, GC.PLAYER_MAX_SPEED);
-			//
-			//FP.camera.x += cameraVX;
-			//FP.camera.y += cameraVY;
 		}
 		
 	}

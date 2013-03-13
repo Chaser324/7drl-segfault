@@ -15,8 +15,6 @@ package com.cp.sf.entities
 	 */
 	public class Map extends Entity
 	{
-		protected var mapWidth:int;
-		protected var mapHeight:int;
 		protected var layout:Array;
 		
 		protected var rooms:Array;
@@ -24,7 +22,7 @@ package com.cp.sf.entities
 		protected var firstRoom:Room;
 		protected var lastRoom:Room;
 		
-		protected var terrainEntities:Array;		
+		public var terrainEntities:Array;		
 		
 		// Number of blocks in height/width of a cell of room grid
 		protected var cell_height:int;
@@ -35,6 +33,8 @@ package com.cp.sf.entities
 		protected var grid_width:int;
 		
 		protected var playerStartPos:MapPoint;
+		
+		protected var buildDone:Boolean;
 		
 		protected static const GRID_BUFFER:int = 1;
 		protected static const CELL_BUFFER:int = 4;
@@ -73,11 +73,13 @@ package com.cp.sf.entities
 					if (cell == GC.MAP_WALL)
 					{
 						terrainEntities[row][col] = new Wall(col, row);
+						ILitObject(terrainEntities[row][col]).light(0);
 						FP.world.add(terrainEntities[row][col]);
 					}
 					else if (cell == GC.MAP_FLOOR || cell == GC.MAP_HALLWAY)
 					{
 						terrainEntities[row][col] = new Floor(col, row);
+						ILitObject(terrainEntities[row][col]).light(0);
 						FP.world.add(terrainEntities[row][col]);
 					}
 				}
@@ -131,12 +133,15 @@ package com.cp.sf.entities
 		private function buildConnections():void
 		{
 			var done:Boolean = false;
+			var r:Room;
+			var r2:Room;
+			var neighborIndex:int;
 			
 			// Build each room's list of neighbors
 			while (!done)
 			{
 				done = true;
-				for each (var r:Room in rooms)
+				for each (r in rooms)
 				{
 					r.neighbors = new Array();
 					buildNeighborList(r);
@@ -159,7 +164,7 @@ package com.cp.sf.entities
 			while (getUnconnectedNeighbors(curRoom).length > 0)
 			{
 				var unconnectedNeighbors:Array = getUnconnectedNeighbors(curRoom);
-				var neighborIndex:int = unconnectedNeighbors[Utils.randomRange(0, unconnectedNeighbors.length - 1)];
+				neighborIndex = unconnectedNeighbors[Utils.randomRange(0, unconnectedNeighbors.length - 1)];
 				
 				connectRooms(curRoom, sortedRooms[neighborIndex]);
 				curRoom = sortedRooms[neighborIndex];
@@ -169,7 +174,7 @@ package com.cp.sf.entities
 			
 			// Get an array of all rooms still unconnected.
 			var unconnectedRooms:Array = new Array();
-			for each (var r:Room in rooms)
+			for each (r in rooms)
 			{
 				if (!r.connected) unconnectedRooms.push(r);
 			}
@@ -177,13 +182,13 @@ package com.cp.sf.entities
 			// Cycle through those unconnected rooms until all of them are connected.
 			while (unconnectedRooms.length > 0)
 			{
-				for each (var r:Room in unconnectedRooms)
+				for each (r in unconnectedRooms)
 				{
 					var connectedNeighbors:Array = getConnectedNeighbors(r);
 					
 					if (connectedNeighbors.length == 0) continue;
 					
-					var neighborIndex:int = connectedNeighbors[Utils.randomRange(0, connectedNeighbors.length - 1)];
+					neighborIndex = connectedNeighbors[Utils.randomRange(0, connectedNeighbors.length - 1)];
 					
 					connectRooms(r, sortedRooms[neighborIndex]);
 					r.connected = true;
@@ -191,11 +196,23 @@ package com.cp.sf.entities
 				}
 				
 				unconnectedRooms = new Array();
-				for each (var r:Room in rooms)
+				for each (r in rooms)
 				{
 					if (!r.connected) unconnectedRooms.push(r);
 				}
 			}
+			
+			// Make some additional random connections
+			var randomConnections:int = Utils.randomRange(3, 6);
+			for (var i:int = 0; i < randomConnections; i++)
+			{
+				r = rooms[Utils.randomRange(0, rooms.length - 1)];
+				r2 = rooms[Utils.randomRange(0, rooms.length - 1)];
+				
+				connectRooms(r, r2);
+			}
+			
+			buildDone = true;
 		}
 		
 		private function generateNewNeighbor(r:Room):void
@@ -235,6 +252,7 @@ package com.cp.sf.entities
 		private function buildNeighborList(r:Room):void
 		{
 			var testIndex:int;
+			var i:int;
 				
 			// scan up
 			for (testIndex = (r.cell_num - grid_width); testIndex >= 0; testIndex -= grid_width)
@@ -260,7 +278,7 @@ package com.cp.sf.entities
 			{
 				// scan left
 				testIndex = r.cell_num;
-				for (var i:int = (r.cell_num % grid_width); i > 0; i--)
+				for (i = (r.cell_num % grid_width); i > 0; i--)
 				{
 					--testIndex;
 					if (sortedRooms[testIndex])
@@ -275,7 +293,7 @@ package com.cp.sf.entities
 			{
 				// scan right
 				testIndex = r.cell_num;
-				for (var i:int = (r.cell_num % grid_width); i < (grid_width - 1); i++)
+				for (i = (r.cell_num % grid_width); i < (grid_width - 1); i++)
 				{
 					++testIndex;
 					if (sortedRooms[testIndex])
@@ -376,6 +394,15 @@ package com.cp.sf.entities
 				exit.y = choice.y;
 				
 				setCell(exit.x, exit.y, GC.MAP_HALLWAY);
+			}
+			
+			for (var row:int = 0; row <= mapHeight; row++)
+			{
+				for (var col:int = 0; col <= mapWidth; col++)
+				{
+					if (getCell(col, row) == GC.MAP_HALLWAY)
+						setCell(col, row, GC.MAP_FLOOR);
+				}
 			}
 		}
 		
@@ -484,10 +511,7 @@ package com.cp.sf.entities
 		}
 		
 		private function generateEmptyMap():void
-		{
-			this.mapHeight = this.grid_height * this.cell_height;
-			this.mapWidth = this.grid_width * this.cell_width;
-			
+		{			
 			this.layout = new Array(this.mapHeight);
 			
 			for (var i:int = 0; i < this.layout.length; i++)
@@ -513,6 +537,16 @@ package com.cp.sf.entities
 		public function get playerStartPosition():MapPoint
 		{
 			return playerStartPos;
+		}
+		
+		public function get mapWidth():int
+		{
+			return this.grid_width * this.cell_width;
+		}
+		
+		public function get mapHeight():int
+		{
+			return this.grid_height * this.cell_height;
 		}
 		
 	}

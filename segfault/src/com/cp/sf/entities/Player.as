@@ -18,10 +18,11 @@ package com.cp.sf.entities
 	{
 		private var playerMoving:Boolean = false;
 		private var target:MapPoint = null;
+		private var playerImg:Spritemap;
 		
 		public function Player(posX:int = 0, posY:int = 0) 
 		{
-			var playerImg:Spritemap = new Spritemap(GFX.GFX_PLAYER, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			playerImg = new Spritemap(GFX.GFX_PLAYER, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
 			this.addGraphic(playerImg);
 			playerImg.setFrame(0, 0);
 			
@@ -58,10 +59,22 @@ package com.cp.sf.entities
 				else if (Input.check("left"))
 				{
 					target = new MapPoint(this.x - GC.MAP_CELL_SIZE, this.y);
+					
+					if (playerImg.scaleX == 1)
+					{
+						playerImg.scaleX = -1;
+						playerImg.x = GC.MAP_CELL_SIZE;
+					}
 				}
 				else if (Input.check("right"))
 				{
 					target = new MapPoint(this.x + GC.MAP_CELL_SIZE, this.y);
+					
+					if (playerImg.scaleX == -1)
+					{
+						playerImg.scaleX = 1;
+						playerImg.x = 0;
+					}
 				}
 				
 				if (target)
@@ -69,6 +82,7 @@ package com.cp.sf.entities
 					var targetTerrain:Object = GameWorld(this.world).getMapTerrain(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 					if (targetTerrain is Floor)
 					{
+						GameWorld(this.world).updatePlayerPosition(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 						playerMoving = true;
 					}
 				}
@@ -84,12 +98,12 @@ package com.cp.sf.entities
 			}
 		}
 		
-		private function get mapX():int
+		public function get mapX():int
 		{
 			return this.x / GC.MAP_CELL_SIZE
 		}
 		
-		private function get mapY():int
+		public function get mapY():int
 		{
 			return this.y / GC.MAP_CELL_SIZE
 		}		

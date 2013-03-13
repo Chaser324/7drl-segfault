@@ -45,10 +45,12 @@ package com.cp.sf
 
 			Text.size = 16;
 
-			Input.define("up", Key.W);
-			Input.define("left", Key.A);
-			Input.define("right", Key.D);
-			Input.define("down", Key.S);
+			Input.define("up", Key.W, Key.UP);
+			Input.define("left", Key.A, Key.LEFT);
+			Input.define("right", Key.D, Key.RIGHT);
+			Input.define("down", Key.S, Key.DOWN);
+			
+			Input.define("map", Key.M);
 
 			contextMenu = new ContextMenu();
 			contextMenu.hideBuiltInItems();

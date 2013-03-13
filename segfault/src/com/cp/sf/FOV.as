@@ -12,41 +12,87 @@ package com.cp.sf
 		private var terrainHeight:int;
 		private var terrainWidth:int;
 		
-		private static const SIGHT_DIAMETER:int = 3;
+		private static const SIGHT_DIAMETER:int = 12;
 		
 		private static const DIRS:Array = [ [ 0, -1],
-											[ 1, -1],
 											[ 1,  0],
-											[ 1,  1],
 											[ 0,  1],
-											[-1,  1],
-											[-1,  0],
-											[-1, -1]
+											[-1,  0]
 										];
 		
 		public function FOV(terrain:Array) 
 		{
 			this.terrain = terrain;
 			terrainHeight = terrain.length;
-			terrainWidth = Array(terrainHeight[0]).length;
+			terrainWidth = terrain[0].length;
 		}
 		
 		public function compute(sx:int, sy:int):void
 		{
+			var i:int;
+			
+			// paint it black
+			for (i = sx - 10; i < sx + 10; i++)
+			{
+				for (var j:int = sy - 10; j < sy + 10; j++)
+				{
+					if (j >= 0 && j < terrainHeight && i >= 0 && i < terrainWidth && terrain[j][i] && terrain[j][i] is ILitObject)
+						terrain[j][i].light(0);
+				}
+			}
+			
 			var doneCells:Array = new Array();
 			var litCells:Array = new Array();
 			
 			// emit light from sx,sy
-			emitLight(sx, xy);
+			emitLight(sx, sy, litCells);
+			doneCells[sy * terrainWidth + sx] = 1;
+			// TODO: computeEmitters
+			
+			for (i = 0; i < litCells.length; i++)
+			{
+				var x:int = i % terrainWidth;
+				var y:int = i / terrainWidth;
+				if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth && terrain[y][x] && terrain[y][x] is ILitObject)
+				{
+					if (litCells[i] != null)
+					{
+						ILitObject(terrain[y][x]).light(litCells[i]);
+					}
+				}
+			}
+			
+			ILitObject(terrain[sy][sx]).light(100);
 		}
 		
-		private function emitLight(sx:int, sy:int):void
+		private function emitLight(sx:int, sy:int, litCells:Array):void
 		{
 			var fov:Array = updateFov(sx, sy);
+			
+			for (var i:int = 0; i < fov.length; i++)
+			{
+				if (fov[i] == null) continue;
+				
+				var formFactor:Number = fov[i];
+				var result:Number;
+				if (litCells[i] != null)
+				{
+					result = litCells[i];
+				}
+				else
+				{
+					result = 0;					
+				}
+				
+				result += Math.round(100 * formFactor);
+				
+				litCells[i] = result;
+			}
 		}
 		
-		private function updateFov(sx:int, sy:int):void
+		private function updateFov(sx:int, sy:int):Array
 		{
+			var cache:Array = [];
 			var shadows:Array = [];
 			var cx:int;
 			var cy:int;
@@ -58,27 +104,40 @@ package com.cp.sf
 			for (var r:int = 1; r <= SIGHT_DIAMETER; r++)
 			{
 				var neighbors:Array = getCircle(sx, sy, r);
-				var neighborCount = neighbors.length;
+				var neighborCount:int = neighbors.length;
 				
 				for (var i:int = 0; i < neighborCount; i++)
 				{
 					cx = neighbors[i][0];
 					cy = neighbors[i][1];
-					A1 = [ (i?2 * i - 1:2 * neighborCount - 1), (2 * neighborCount)];
+					A1 = [ (i?(2 * i - 1):(2 * neighborCount - 1)), (2 * neighborCount)];
 					A2 = [ (2 * i + 1), (2 * neighborCount)];
 					
 					blocks = !this.lightPasses(cx, cy);
 					visibility = this.checkVisibility(A1, A2, blocks, shadows);
+					if (visibility) {
+						var formFactor:Number = visibility * (1 - r / SIGHT_DIAMETER);
+						if (formFactor != 0) cache[cy * terrainWidth + cx] = formFactor;
+					}
+					if (shadows.length == 2 && shadows[0][0] == 0 && shadows[1][0] == shadows[1][1]) 
+					{ 
+						return cache; 
+					}
 				}
 			}
+			
+			return cache;
 		}
 		
 		private function checkVisibility(A1:Array, A2:Array, blocks:Boolean, shadows:Array):Number
 		{
+			var old:Array;
+			var diff:Number;
+			
 			if (A1[0] > A2[0])
 			{
-				var v1 = this.checkVisibility(A1, [ A1[1], A1[1]], blocks, shadows);
-				var v2 = this.checkVisibility([0, 1], A2, blocks, shadows);
+				var v1:Number = this.checkVisibility(A1, [ A1[1], A1[1]], blocks, shadows);
+				var v2:Number = this.checkVisibility([0, 1], A2, blocks, shadows);
 				return (v1 + v2) / 2;
 			}
 			
@@ -86,8 +145,8 @@ package com.cp.sf
 			var edge1:Boolean = false;
 			while (index1 < shadows.length)
 			{
-				var old:Array = shadows[index1];
-				var diff:Number = old[0] * A1[1] - A1[0] * old[1];
+				old = shadows[index1];
+				diff = old[0] * A1[1] - A1[0] * old[1];
 				if (diff >= 0)
 				{
 					if (diff == 0 && !(index1 % 2)) 
@@ -103,8 +162,8 @@ package com.cp.sf
 			var edge2:Boolean = false;
 			while (index2--)
 			{
-				var old:Array = shadows[index2];
-				var diff:Number = A2[0] * old[1] - old[0] * A2[1];
+				old = shadows[index2];
+				diff = A2[0] * old[1] - old[0] * A2[1];
 				if (diff >= 0)
 				{
 					if (diff == 0 && (index2 % 2))
@@ -163,14 +222,17 @@ package com.cp.sf
 		
 		private function lightPasses(x:int, y:int):Boolean
 		{
-			return !(ILitObject(terrain[y][x]).blocksLight());
+			if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth && terrain[y][x])
+				return !(terrain[y][x].blocksLight());
+			else
+				return false;
 		}
 		
 		private function getCircle(sx:int, sy:int, r:int):Array
 		{
 			var result:Array = [];
-			var x = sx + (-r);
-			var y = sy + r;
+			var x:int = sx + (-r);
+			var y:int = sy + r;
 			
 			for (var i:int = 0; i < DIRS.length; i++)
 			{

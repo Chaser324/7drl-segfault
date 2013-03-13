@@ -10,6 +10,12 @@ package com.cp.sf
 		
 		[Embed(source = "../../../../assets/player.png")]
 		public static const GFX_PLAYER:Class;
+		
+		[Embed(source="../../../../assets/ui/ui-phone.png")]
+		public static const GFX_UI_PHONE:Class;
+		
+		[Embed(source="../../../../assets/ui/ui-icons.png")]
+		public static const GFX_UI_ICONS:Class;
 	}
 
 }
