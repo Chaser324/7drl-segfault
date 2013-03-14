@@ -136,6 +136,17 @@ package com.cp.sf
 		[Embed(source="../../../../assets/gfx/intro/asleep-bubble.png")]
 		public static const GFX_INTRO_SLEEP_BUBBLE:Class;
 		
+		[Embed(source="../../../../assets/gfx/intro/intro-monitor.png")]
+		public static const GFX_INTRO_MONITOR_3:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-screen-3.png")]
+		public static const GFX_INTRO_SCREEN_3:Class;
+		
+		/**
+		 * CHARACTER CREATE
+		 */
+		
+		
 	}
 
 }

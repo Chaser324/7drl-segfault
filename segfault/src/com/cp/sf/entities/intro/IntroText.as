@@ -62,7 +62,7 @@ package com.cp.sf.entities.intro
 		{
 			glitchEffectFg.maxSlide = 0;
 			
-			glitchTimerFg = new Timer(1000, 1);
+			glitchTimerFg = new Timer(1500, 1);
 			glitchTimerFg.addEventListener(TimerEvent.TIMER, nextScene);
 			glitchTimerFg.start();
 		}

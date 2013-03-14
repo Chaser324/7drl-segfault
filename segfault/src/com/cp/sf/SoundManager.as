@@ -30,6 +30,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/sfx/snore-exhale.mp3")]
 		public static const SFX_INTRO_EXHALE:Class;
 		
+		[Embed(source="../../../../assets/sfx/phone-vibrate.mp3")]
+		public static const SFX_PHONE_VIBRATE:Class;
+		
 		/**
 		 * MUSIC INSTNANTIATIONS
 		 */

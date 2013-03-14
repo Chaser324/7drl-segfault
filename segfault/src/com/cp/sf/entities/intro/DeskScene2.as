@@ -51,7 +51,7 @@ package com.cp.sf.entities.intro
 		private function exhale():void
 		{
 			++loopCount;
-			if (loopCount < 3)
+			if (loopCount < 2)
 			{
 				bubble.play("exhale");
 				SoundManager.playSound(SoundManager.SFX_INTRO_EXHALE, 0, inhale);

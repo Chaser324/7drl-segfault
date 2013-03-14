@@ -1,5 +1,6 @@
 package com.cp.sf.worlds 
 {
+	import net.flashpunk.FP;
 	import net.flashpunk.World;
 	
 	/**
@@ -12,6 +13,17 @@ package com.cp.sf.worlds
 		public function CharCreateWorld() 
 		{
 			
+		}
+		
+		override public function begin():void
+		{
+			super.begin();
+		}
+		
+		override public function update():void
+		{
+			FP.world = new IntroWorld(6);
+			super.update();
 		}
 		
 	}
