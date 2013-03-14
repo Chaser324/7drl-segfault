@@ -1,15 +1,32 @@
 package com.cp.sf 
 {
+	import net.flashpunk.Sfx;
+	
 	/**
 	 * Container for Embedded Sounds and Sound Related Static Functions
 	 */
 	public final class SoundManager 
 	{
-		//[Embed(source="somesoundeffect.mp3")] public static const SOME_SOUND_EFFECT:Class;
+		/**
+		 * MUSIC EMBEDS
+		 */
+		
+		[Embed(source="../../../../assets/music/title.mp3")]
+		public static const MUSIC_TITLE:Class;
+		
+		/**
+		 * SOUND EFFECT EMBEDS
+		 */
+		
+		[Embed(source = "../../../../assets/sfx/title-gunshot.mp3")]
+		public static const SFX_TITLE_GUNSHOT:Class;
+		
+		/**
+		 * MUSIC INSTNANTIATIONS
+		 */
 
-		//[Embed(source="somemusic.mp3")] public static const SOME_MUSIC:Class;
-
-		//public static var some_music:Sfx = new Sfx(SOME_MUSIC);
+		public static var music_title:Sfx = new Sfx(MUSIC_TITLE);		
+		
 		
 		private static var _currentMusic:Sfx;
 
@@ -24,15 +41,15 @@ package com.cp.sf
 			{
 				if(_currentMusic) _currentMusic.stop();
 				_currentMusic = music;
-				_currentMusic.volume = G.volumeMusic;
-				_currentMusic.loop(G.volumeMusic);
+				_currentMusic.volume = GV.volumeMusic;
+				_currentMusic.loop(GV.volumeMusic);
 			}
 		}
 
-		public static function playSound(name:String, pan:Number=0, callback:Function=null):void
+		public static function playSound(sound:Class, pan:Number=0, callback:Function=null):void
 		{
-			var s:Sfx = new Sfx(this[name.toUpperCase()], callback);
-			s.play(G.volumeSound, pan);
+			var s:Sfx = new Sfx(sound, callback);
+			s.play(GV.volumeSound, pan);
 		}
 		
 	}

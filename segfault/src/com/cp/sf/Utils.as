@@ -49,7 +49,7 @@ package com.cp.sf
 		 */
 		public static function randomRange(minNum:Number, maxNum:Number, decimal:Boolean=false):Number
 		{
-			var retVal:Number = (Math.random() * (maxNum - minNum + 1)) + minNum;
+			var retVal:Number = (Math.random() * (maxNum - minNum)) + minNum;
 			
 			if (!decimal)
 			{

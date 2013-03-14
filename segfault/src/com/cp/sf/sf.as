@@ -2,6 +2,8 @@ package com.cp.sf
 {
 	import com.cp.sf.Preloader;
 	import com.cp.sf.worlds.GameWorld;
+	import com.cp.sf.worlds.TitleWorld;
+	import flash.display.StageDisplayState;
 	import flash.display.StageQuality;
 	import flash.events.FullScreenEvent;
 	import net.flashpunk.Engine;
@@ -17,11 +19,10 @@ package com.cp.sf
 	/**
 	 * 
 	 */
-	[SWF(width = '800', height = '600', frameRate='60', backgroundColor = '#000000')]
-	// TODO: finish preloader - [Frame(factoryClass = "com.cp.tde.Preloader")]
+	[SWF(width = '800', height = '600', backgroundColor = '#000000')]
+	// TODO: [Frame(factoryClass = "com.cp.sf.Preloader")]
 	public class sf extends Engine
-	{
-		
+	{		
 		public function sf() 
 		{
 			super(800, 600, 60, false);
@@ -51,12 +52,16 @@ package com.cp.sf
 			Input.define("down", Key.S, Key.DOWN);
 			
 			Input.define("map", Key.M);
+			
+			Input.define("fullscreen", Key.F2);
+			
+			Input.define("back", Key.BACKSPACE);
 
 			contextMenu = new ContextMenu();
 			contextMenu.hideBuiltInItems();
 
 			// TODO: Insert site-locking code here.
-			FP.world = new GameWorld;
+			FP.world = new TitleWorld();
 
 			//SoundManager.i.currentMusic = SoundManager.i.menuMusic;
 		}
@@ -67,12 +72,17 @@ package com.cp.sf
 			
 			GV.fullscreen = false;
 			//stage.scaleMode = StageScaleMode.SHOW_ALL;
-			stage.quality = StageQuality.LOW;
+			stage.quality = StageQuality.HIGH;
 			stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreen);
 		}
 
 		override public function update():void
 		{
+			if (Input.pressed("fullscreen"))
+			{
+				toggleFullScreen();
+			}
+			
 			super.update();
 
 			Utils.quake.update();
@@ -84,6 +94,18 @@ package com.cp.sf
 			super.render();
 
 			Utils.flash.render();
+		}
+		
+		private function toggleFullScreen():void
+		{
+			if (stage.displayState == StageDisplayState.NORMAL)
+			{
+				stage.displayState = StageDisplayState.FULL_SCREEN;
+			}
+			else
+			{
+				//stage.displayState = StageDisplayState.NORMAL;
+			}
 		}
 		
 		private function handleFullScreen(e:FullScreenEvent):void

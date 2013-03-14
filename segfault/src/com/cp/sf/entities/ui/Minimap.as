@@ -28,7 +28,7 @@ package com.cp.sf.entities.ui
 		private static const CELL_SIZE:int = 4;
 		private static const MAP_WALL_COLOR:uint = 0xFF999999;
 		private static const MAP_FLOOR_COLOR:uint = 0xFF333333;
-		private static const PLAYER_COLOR:uint = 0xFFFF0000;
+		private static const PLAYER_COLOR:uint = 0xFF00FF00;
 		
 		public function Minimap(mapHeight:int, mapWidth:int)
 		{

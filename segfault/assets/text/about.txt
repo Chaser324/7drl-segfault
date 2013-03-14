@@ -1,0 +1,18 @@
+## Credits ##
+
+Design, Code, and Art by
+* Chase Pettit (twitter: @chasepettit)
+
+Music
+* Title Screen: DarkStart by DST (http://nosoapradio.us), CC-BY
+Sound Effects
+* Gunshot: stevegyos93, CC-BY
+
+Thanks
+* @McFunkypants - Creator of #1GAM, one of the motivators for making this thing happen.
+* @DarkestKale - Creator of #PixelChallenge which reignited my desire to make games.
+* @ChevyRay - Creator of FlashPunk, a great framework for developing Flash games.
+
+## Libraries ##
+* [FlashPunk](https://github.com/ChevyRay/FlashPunk)
+* [punk.fx](https://github.com/azrafe7/punk.fx)

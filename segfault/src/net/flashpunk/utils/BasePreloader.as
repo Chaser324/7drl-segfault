@@ -16,7 +16,7 @@ package net.flashpunk.utils
 		 * get the correct main class and game dementions
 		 */
 		public var mainClass:Class;
-		public var bounds:Rectangle = new Rectangle(0, 0, 700, 600);
+		public var bounds:Rectangle = new Rectangle(0, 0, 800, 600);
 		//The minimum amout of time to display the preloader. Default '0' or any time.
 		public var minTime:int = 0;
 		
@@ -24,7 +24,7 @@ package net.flashpunk.utils
 		 * Other variables to handle the animation and timing.
 		 */
 		//The Flashpunk logo, in classic retro style
-		[Embed(source="../../../../assets/gfx/100x100strip.png")] private var _s:Class;
+		[Embed(source="../../../../assets/gfx/preloader/100x100strip.png")] private var _s:Class;
 		//animation count
 		private var count:int = 0;
 		//t(ime)
