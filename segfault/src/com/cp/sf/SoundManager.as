@@ -14,6 +14,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/music/title.mp3")]
 		public static const MUSIC_TITLE:Class;
 		
+		[Embed(source="../../../../assets/music/intro.mp3")]
+		public static const MUSIC_INTRO:Class;
+		
 		/**
 		 * SOUND EFFECT EMBEDS
 		 */
@@ -21,11 +24,18 @@ package com.cp.sf
 		[Embed(source = "../../../../assets/sfx/title-gunshot.mp3")]
 		public static const SFX_TITLE_GUNSHOT:Class;
 		
+		[Embed(source="../../../../assets/sfx/snore-inhale.mp3")]
+		public static const SFX_INTRO_INHALE:Class;
+		
+		[Embed(source="../../../../assets/sfx/snore-exhale.mp3")]
+		public static const SFX_INTRO_EXHALE:Class;
+		
 		/**
 		 * MUSIC INSTNANTIATIONS
 		 */
 
-		public static var music_title:Sfx = new Sfx(MUSIC_TITLE);		
+		public static var music_title:Sfx = new Sfx(MUSIC_TITLE);
+		public static var music_intro:Sfx = new Sfx(MUSIC_INTRO);
 		
 		
 		private static var _currentMusic:Sfx;

@@ -76,6 +76,66 @@ package com.cp.sf
 		
 		[Embed(source="../../../../assets/gfx/title/title-gunshot-3.png")]
 		public static const GFX_TITLE_GUNSHOT3:Class;
+		
+		/**
+		 * INTRO
+		 */
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-0-bg.png")]
+		public static const GFX_INTRO_TEXT0_BG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-0-fg.png")]
+		public static const GFX_INTRO_TEXT0_FG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-2-bg.png")]
+		public static const GFX_INTRO_TEXT1_BG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-2-fg.png")]
+		public static const GFX_INTRO_TEXT1_FG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-3-bg.png")]
+		public static const GFX_INTRO_TEXT2_BG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-3-fg.png")]
+		public static const GFX_INTRO_TEXT2_FG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-4-bg.png")]
+		public static const GFX_INTRO_TEXT3_BG:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-4-fg.png")]
+		public static const GFX_INTRO_TEXT3_FG:Class;
+		
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-keyboard.png")]
+		public static const GFX_INTRO_KEYBOARD:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-desk.png")]
+		public static const GFX_INTRO_DESK:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/awake-monitor.png")]
+		public static const GFX_INTRO_MONITOR_1:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/awake-person.png")]
+		public static const GFX_INTRO_PERSON_1:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/awake-head.png")]
+		public static const GFX_INTRO_PERSON_1_HEAD:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-screen-1.png")]
+		public static const GFX_INTRO_SCREEN_1:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/intro-screen-2.png")]
+		public static const GFX_INTRO_SCREEN_2:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/asleep-person.png")]
+		public static const GFX_INTRO_PERSON_2:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/asleep-monitor.png")]
+		public static const GFX_INTRO_MONITOR_2:Class;
+		
+		[Embed(source="../../../../assets/gfx/intro/asleep-bubble.png")]
+		public static const GFX_INTRO_SLEEP_BUBBLE:Class;
+		
 	}
 
 }

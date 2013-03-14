@@ -5,8 +5,11 @@ Design, Code, and Art by
 
 Music
 * Title Screen: DarkStart by DST (http://nosoapradio.us), CC-BY
+* Intro: Robotical by DST (http://nosoapradio.us), CC-BY
+* Char Create: Elevator Music by Khuskan (http://khuskan.newgrounds.com), CC-BY-NC-SA
 Sound Effects
 * Gunshot: stevegyos93, CC-BY
+* Snore: PopupPixels, CC-BY
 
 Thanks
 * @McFunkypants - Creator of #1GAM, one of the motivators for making this thing happen.

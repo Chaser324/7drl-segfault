@@ -17,6 +17,7 @@ package com.cp.sf.worlds
 	import net.flashpunk.World;
 	import punk.fx.effects.FX;
 	import punk.fx.effects.GlitchFX;
+	import punk.fx.effects.ScanLinesFX;
 	import punk.fx.graphics.FXImage;
 	
 	/**
@@ -43,6 +44,7 @@ package com.cp.sf.worlds
 		
 		protected var titleGlitch:GlitchFX;
 		protected var bgGlitch:GlitchFX;
+		protected var noiseEffect:ScanLinesFX;
 		
 		protected var shotsFired:int = 0;
 		
@@ -66,6 +68,9 @@ package com.cp.sf.worlds
 			
 			bgGlitch = new GlitchFX(0, 5, 1);
 			bg.effects.add(bgGlitch);
+			
+			noiseEffect = new ScanLinesFX(true, 25);
+			bg.effects.add(noiseEffect);
 			
 			startButton = new TitleButton(251, 297, GFX.GFX_TITLE_START_BUTTON, 313, 38, startGame);
 			startButton.layer = 8;
@@ -98,6 +103,11 @@ package com.cp.sf.worlds
 			bgTimer.start();
 			
 			SoundManager.currentMusic = SoundManager.music_title;
+		}
+		
+		override public function begin():void
+		{
+			super.begin();
 		}
 		
 		override public function end():void
@@ -226,7 +236,7 @@ package com.cp.sf.worlds
 		
 		private function nextWorld():void
 		{
-			FP.world = new GameWorld();
+			FP.world = new IntroWorld();
 		}
 	}
 
