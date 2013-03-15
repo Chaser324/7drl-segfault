@@ -15,7 +15,7 @@ package net.flashpunk.utils
 		 * Edit these values in your preloader class to
 		 * get the correct main class and game dementions
 		 */
-		public var mainClass:Class;
+		public var mainClass:String;
 		public var bounds:Rectangle = new Rectangle(0, 0, 800, 600);
 		//The minimum amout of time to display the preloader. Default '0' or any time.
 		public var minTime:int = 0;
@@ -96,8 +96,8 @@ package net.flashpunk.utils
 			removeChild(background);
 			
 			//create the main class, and add it to the stage
-			var m:DisplayObject = new mainClass() as DisplayObject;
-			addChild(m);
+			var mainClassObj:Class = getDefinitionByName(mainClass) as Class;
+			addChild(new mainClassObj() as DisplayObject);
 		}
 	}
 }

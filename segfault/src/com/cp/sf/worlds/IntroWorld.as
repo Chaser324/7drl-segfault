@@ -80,7 +80,7 @@ package com.cp.sf.worlds
 				case 3:
 					this.remove(introText);
 					
-					SoundManager.currentMusic.stop();
+					//SoundManager.currentMusic.stop();
 					
 					deskScene2 = new DeskScene2();
 					this.add(deskScene2);
@@ -89,7 +89,7 @@ package com.cp.sf.worlds
 				case 4:
 					this.remove(deskScene2);
 					
-					SoundManager.currentMusic.play();
+					//SoundManager.currentMusic.play();
 					
 					introText = new IntroText(GFX.GFX_INTRO_TEXT2_BG, GFX.GFX_INTRO_TEXT2_FG);
 					this.add(introText);

@@ -15,6 +15,7 @@ package com.cp.sf.entities
 	 */
 	public class Map extends Entity
 	{
+		//{ region Instance Variables
 		protected var layout:Array;
 		
 		protected var rooms:Array;
@@ -36,9 +37,19 @@ package com.cp.sf.entities
 		
 		protected var buildDone:Boolean;
 		
-		protected static const GRID_BUFFER:int = 1;
+		//} endregion
+		
+		//{ region Constants
+		
+		protected static const GRID_BUFFER:int = 0;
 		protected static const CELL_BUFFER:int = 4;
-		protected static const GRID_MIN_SIZE:int = 2;
+		protected static const GRID_MIN_SIZE:int = 3;
+		protected static const MIN_RANDOM_CONNECTIONS = 5;
+		protected static const MAX_RANDOM_CONNECTIONS = 8;
+		
+		//} endregion
+		
+		//{ region Constructor
 		
 		public function Map() 
 		{			
@@ -46,6 +57,10 @@ package com.cp.sf.entities
 			
 			super();
 		}
+		
+		//} endregion
+		
+		//{ region Private Methods
 		
 		private function buildMap():void
 		{
@@ -60,75 +75,112 @@ package com.cp.sf.entities
 			//traceMap();
 		}
 		
-		private function drawMap():void
-		{
-			terrainEntities = new Array(this.mapHeight);
-			for (var row:int = 0; row < layout.length; row++)
-			{
-				terrainEntities[row] = new Array(this.mapWidth);
-				for (var col:int = 0; col < layout[row].length; col++)
-				{
-					var cell:String = getCell(col, row);
-					
-					if (cell == GC.MAP_WALL)
-					{
-						terrainEntities[row][col] = new Wall(col, row);
-						ILitObject(terrainEntities[row][col]).light(0);
-						FP.world.add(terrainEntities[row][col]);
-					}
-					else if (cell == GC.MAP_FLOOR || cell == GC.MAP_HALLWAY)
-					{
-						terrainEntities[row][col] = new Floor(col, row);
-						ILitObject(terrainEntities[row][col]).light(0);
-						FP.world.add(terrainEntities[row][col]);
-					}
-				}
-			}
-		}
+		//{ region Phase 1: Initial Map/Grid Generation
 		
-		private function placePlayer():void
-		{
-			var tile:String = "";
-			playerStartPos = new MapPoint();
+		private function generateEmptyMap():void
+		{			
+			this.layout = new Array(this.mapHeight);
 			
-			while (tile != GC.MAP_FLOOR)
+			for (var i:int = 0; i < this.layout.length; i++)
 			{
-				playerStartPos.x = firstRoom.mapX + Utils.randomRange(0, firstRoom.roomWidth - 1);
-				playerStartPos.y = firstRoom.mapY + Utils.randomRange(0, firstRoom.roomHeight - 1);
-				tile = getCell(playerStartPos.x, playerStartPos.y);
-			}
-		}
-		
-		private function addWalls():void
-		{
-			for (var row:int = 0; row < layout.length; row++)
-			{
-				for (var col:int = 0; col < layout[row].length; col++)
+				this.layout[i] = new String();
+				
+				for (var j:int = 0; j < this.mapWidth; j++)
 				{
-					if (getCell(col, row) == GC.MAP_EMPTY)
-					{
-						var neighbors:Array = new Array();
-						neighbors[0] = new MapPoint(col, row - 1);
-						neighbors[1] = new MapPoint(col + 1, row);
-						neighbors[2] = new MapPoint(col, row + 1);
-						neighbors[3] = new MapPoint(col - 1, row);
-						neighbors[4] = new MapPoint(col + 1, row - 1);
-						neighbors[5] = new MapPoint(col + 1, row + 1);
-						neighbors[6] = new MapPoint(col - 1, row + 1);
-						neighbors[7] = new MapPoint(col - 1, row - 1);
-						
-						for each (var point:MapPoint in neighbors)
-						{
-							if (getCell(point.x, point.y) == GC.MAP_FLOOR || getCell(point.x, point.y) == GC.MAP_HALLWAY)
-							{
-								setCell(col, row, GC.MAP_WALL);
-								break;
-							}
-						}
-					}
+					this.layout[i] = String(this.layout[i]).concat(GC.MAP_EMPTY);
 				}
 			}
 		}
+		
+		private function buildGrid():void
+		{
+			// Cell size has longest room height/width plus a small buffer.
+			cell_height = 0;
+			cell_width = 0;
+			
+			for each (var r:Room in rooms)
+			{
+				if (r.roomHeight > cell_height)
+				{
+					cell_height = r.roomHeight;
+				}
+				if (r.roomWidth > cell_width)
+				{
+					cell_width = r.roomWidth;
+				}
+			}
+			
+			cell_height += CELL_BUFFER;
+			cell_width += CELL_BUFFER;
+			
+			// Get grid size
+			grid_height = Utils.randomRange(GRID_MIN_SIZE, rooms.length / 2);
+			grid_width = Math.ceil((1.0 * rooms.length) / grid_height);
+			
+			grid_height += GRID_BUFFER;
+			grid_width += GRID_BUFFER;
+		}
+		
+		//} endregion
+		
+		//{ region Phase 2: Room Generation/Placement
+		
+		private function buildRoomList():void
+		{
+			rooms = new Array();
+			for (var i:int = 0; i < Utils.randomRange(12, 15); i++)
+			{
+				rooms.push(new SmallOffice());
+			}
+		}
+		
+		private function placeRooms():void
+		{
+			// As rooms are placed, they are added to this array (makes it easier to find neighbors)
+			sortedRooms = new Array(grid_height * grid_width);
+			
+			// Generate a list of cell numbers
+			var cells:Array = new Array();
+			for (var i:int = 0; i < grid_height * grid_width; i++) cells.push(i);
+			
+			for each (var r:Room in rooms)
+			{
+				// Assign the room a cell
+				var n:int = Utils.randomRange(0, cells.length - 1);
+				r.cell_num = cells[n];
+				cells.splice(n, 1);
+				
+				// Insert cell into sorted array
+				sortedRooms[r.cell_num] = r;
+				
+				// Place room in cell on layout
+				addRoomToMap(r);
+			}
+		}
+		
+		private function addRoomToMap(room:Room):void
+		{
+			// Set map x and y cooridantes of room
+			room.mapX = (room.cell_num % grid_width) * cell_width + 1;
+			room.mapY = int(room.cell_num / grid_width) * cell_height + 1;
+			
+			// Add random offset within the cell
+			room.mapX += Utils.randomRange(0, (cell_width - room.roomWidth - 2));
+			room.mapY += Utils.randomRange(0, (cell_height - room.roomHeight - 2));
+			
+			// Copy room layout to map layout
+			for (var i:int = 0; i < room.roomHeight; i++)
+			{
+				for (var j:int = 0; j < room.roomWidth; j++)
+				{
+					setCell(j + room.mapX, i + room.mapY, String(room.roomLayout[i]).charAt(j));
+				}
+			}
+		}
+
+		//} endregion
+		
+		//{ region Phase 3: Connecting Rooms
 		
 		private function buildConnections():void
 		{
@@ -203,7 +255,7 @@ package com.cp.sf.entities
 			}
 			
 			// Make some additional random connections
-			var randomConnections:int = Utils.randomRange(3, 6);
+			var randomConnections:int = Utils.randomRange(MIN_RANDOM_CONNECTIONS, MAX_RANDOM_CONNECTIONS);
 			for (var i:int = 0; i < randomConnections; i++)
 			{
 				r = rooms[Utils.randomRange(0, rooms.length - 1)];
@@ -406,93 +458,108 @@ package com.cp.sf.entities
 			}
 		}
 		
-		private function buildRoomList():void
-		{
-			rooms = new Array();
-			for (var i:int = 0; i < Utils.randomRange(8, 12); i++)
-			{
-				rooms.push(new SmallOffice());
-			}
-		}
+		//} endregion
 		
-		private function placeRooms():void
-		{
-			// As rooms are placed, they are added to this array (makes it easier to find neighbors)
-			sortedRooms = new Array(grid_height * grid_width);
-			
-			// Generate a list of cell numbers
-			var cells:Array = new Array();
-			for (var i:int = 0; i < grid_height * grid_width; i++) cells.push(i);
-			
-			for each (var r:Room in rooms)
-			{
-				// Assign the room a cell
-				var n:int = Utils.randomRange(0, cells.length - 1);
-				r.cell_num = cells[n];
-				cells.splice(n, 1);
-				
-				// Insert cell into sorted array
-				sortedRooms[r.cell_num] = r;
-				
-				// Place room in cell on layout
-				addRoomToMap(r);
-			}
-		}
+		//{ region Phase 4: Drawing Map
 		
-		private function buildGrid():void
+		private function drawMap():void
 		{
-			// Cell size has longest room height/width plus a small buffer.
-			cell_height = 0;
-			cell_width = 0;
-			
-			for each (var r:Room in rooms)
+			terrainEntities = new Array(this.mapHeight);
+			for (var row:int = 0; row < layout.length; row++)
 			{
-				if (r.roomHeight > cell_height)
+				terrainEntities[row] = new Array(this.mapWidth);
+				for (var col:int = 0; col < layout[row].length; col++)
 				{
-					cell_height = r.roomHeight;
-				}
-				if (r.roomWidth > cell_width)
-				{
-					cell_width = r.roomWidth;
-				}
-			}
-			
-			cell_height += CELL_BUFFER;
-			cell_width += CELL_BUFFER;
-			
-			// Get grid size
-			grid_height = Utils.randomRange(GRID_MIN_SIZE, rooms.length / 2);
-			grid_width = Math.ceil((1.0 * rooms.length) / grid_height);
-			
-			grid_height += GRID_BUFFER;
-			grid_width += GRID_BUFFER;
-		}
-		
-		private function addRoomToMap(room:Room):void
-		{
-			// Set map x and y cooridantes of room
-			room.mapX = (room.cell_num % grid_width) * cell_width + 1;
-			room.mapY = int(room.cell_num / grid_width) * cell_height + 1;
-			
-			// Add random offset within the cell
-			room.mapX += Utils.randomRange(0, (cell_width - room.roomWidth - 2));
-			room.mapY += Utils.randomRange(0, (cell_height - room.roomHeight - 2));
-			
-			// Copy room layout to map layout
-			for (var i:int = 0; i < room.roomHeight; i++)
-			{
-				for (var j:int = 0; j < room.roomWidth; j++)
-				{
-					setCell(j + room.mapX, i + room.mapY, String(room.roomLayout[i]).charAt(j));
+					var cell:String = getCell(col, row);
+					
+					if (cell == GC.MAP_WALL)
+					{
+						terrainEntities[row][col] = new Wall(col, row);
+						ILitObject(terrainEntities[row][col]).light(0);
+						FP.world.add(terrainEntities[row][col]);
+					}
+					else if (cell == GC.MAP_FLOOR || cell == GC.MAP_HALLWAY)
+					{
+						terrainEntities[row][col] = new Floor(col, row);
+						ILitObject(terrainEntities[row][col]).light(0);
+						FP.world.add(terrainEntities[row][col]);
+					}
 				}
 			}
 		}
-
+		
+		private function addWalls():void
+		{
+			for (var row:int = 0; row < layout.length; row++)
+			{
+				for (var col:int = 0; col < layout[row].length; col++)
+				{
+					if (getCell(col, row) == GC.MAP_EMPTY)
+					{
+						var neighbors:Array = new Array();
+						neighbors[0] = new MapPoint(col, row - 1);
+						neighbors[1] = new MapPoint(col + 1, row);
+						neighbors[2] = new MapPoint(col, row + 1);
+						neighbors[3] = new MapPoint(col - 1, row);
+						neighbors[4] = new MapPoint(col + 1, row - 1);
+						neighbors[5] = new MapPoint(col + 1, row + 1);
+						neighbors[6] = new MapPoint(col - 1, row + 1);
+						neighbors[7] = new MapPoint(col - 1, row - 1);
+						
+						for each (var point:MapPoint in neighbors)
+						{
+							if (getCell(point.x, point.y) == GC.MAP_FLOOR || getCell(point.x, point.y) == GC.MAP_HALLWAY)
+							{
+								setCell(col, row, GC.MAP_WALL);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		//} endregion
+		
+		//{ region Phase 5: Populating Map
+		
+		private function placePlayer():void
+		{
+			var tile:String = "";
+			playerStartPos = new MapPoint();
+			
+			while (tile != GC.MAP_FLOOR)
+			{
+				playerStartPos.x = firstRoom.mapX + Utils.randomRange(0, firstRoom.roomWidth - 1);
+				playerStartPos.y = firstRoom.mapY + Utils.randomRange(0, firstRoom.roomHeight - 1);
+				tile = getCell(playerStartPos.x, playerStartPos.y);
+			}
+		}
+		
+		//} endregion
+		
+		//{ region Misc
+		
 		private function setCell(cellX:int, cellY:int, data:String):void
 		{
 			var curRow:String = this.layout[cellY];
 			this.layout[cellY] = curRow.substr(0,cellX) + data + curRow.substr(cellX + 1);
 		}
+		
+		private function traceMap():void
+		{
+			trace("Current " + this.mapWidth + "x" + this.mapHeight +  " map...");
+			for (var i:int = 0; i < this.mapHeight; i++)
+			{
+				trace(String(this.layout[i]));
+			}
+		}
+		
+		//} endregion
+		
+		//} endregion
+		
+		//{ region Public Methods
 		
 		public function getCell(cellX:int, cellY:int):String
 		{
@@ -510,29 +577,9 @@ package com.cp.sf.entities
 			return terrainEntities[cellY][cellX];
 		}
 		
-		private function generateEmptyMap():void
-		{			
-			this.layout = new Array(this.mapHeight);
-			
-			for (var i:int = 0; i < this.layout.length; i++)
-			{
-				this.layout[i] = new String();
-				
-				for (var j:int = 0; j < this.mapWidth; j++)
-				{
-					this.layout[i] = String(this.layout[i]).concat(GC.MAP_EMPTY);
-				}
-			}
-		}
+		//} endregion
 		
-		private function traceMap():void
-		{
-			trace("Current " + this.mapWidth + "x" + this.mapHeight +  " map...");
-			for (var i:int = 0; i < this.mapHeight; i++)
-			{
-				trace(String(this.layout[i]));
-			}
-		}
+		//{ region Public Accessors
 		
 		public function get playerStartPosition():MapPoint
 		{
@@ -548,6 +595,8 @@ package com.cp.sf.entities
 		{
 			return this.grid_height * this.cell_height;
 		}
+		
+		//} endregion
 		
 	}
 

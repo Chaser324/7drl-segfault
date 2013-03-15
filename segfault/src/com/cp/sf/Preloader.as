@@ -10,7 +10,7 @@ package com.cp.sf
 	{		
 		public function Preloader()
 		{
-			mainClass = com.cp.sf.sf;
+			mainClass = "com.cp.sf.sf";
 			minTime = 60;
 			super();
 		}

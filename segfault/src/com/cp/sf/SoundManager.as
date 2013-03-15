@@ -17,6 +17,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/music/intro.mp3")]
 		public static const MUSIC_INTRO:Class;
 		
+		[Embed(source="../../../../assets/music/floor1.mp3")]
+		public static const MUSIC_FLOOR_1:Class;
+		
 		/**
 		 * SOUND EFFECT EMBEDS
 		 */
@@ -39,6 +42,7 @@ package com.cp.sf
 
 		public static var music_title:Sfx = new Sfx(MUSIC_TITLE);
 		public static var music_intro:Sfx = new Sfx(MUSIC_INTRO);
+		public static var music_floor1:Sfx = new Sfx(MUSIC_FLOOR_1);
 		
 		
 		private static var _currentMusic:Sfx;

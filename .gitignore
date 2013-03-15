@@ -8,6 +8,7 @@ tmp/*
 obj/
 raw-assets/*
 .settings/
+demo-site/*.swf
 
 ####################################################################################
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`

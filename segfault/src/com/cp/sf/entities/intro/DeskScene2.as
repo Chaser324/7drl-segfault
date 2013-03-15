@@ -3,6 +3,8 @@ package com.cp.sf.entities.intro
 	import com.cp.sf.GFX;
 	import com.cp.sf.SoundManager;
 	import com.cp.sf.worlds.IntroWorld;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	import net.flashpunk.Entity;
 	import net.flashpunk.FP;
 	import net.flashpunk.graphics.Image;
@@ -16,13 +18,13 @@ package com.cp.sf.entities.intro
 	{
 		private var bubble:Spritemap;
 		private var screenAnim:Spritemap;
-		private var loopCount:int = 0;
+		
+		private var endTimer:Timer;
 		
 		public function DeskScene2() 
 		{
 			bubble = new Spritemap(GFX.GFX_INTRO_SLEEP_BUBBLE, 72, 66);
-			bubble.add("inhale", [1], 0, false);
-			bubble.add("exhale", [0], 0, false);
+			bubble.add("anim", [0, 1], 2, true);
 			bubble.x = 450;
 			bubble.y = 290;
 			
@@ -39,27 +41,17 @@ package com.cp.sf.entities.intro
 			addGraphic(bubble);
 			addGraphic(new Image(GFX.GFX_INTRO_PERSON_2));
 			
-			inhale();
+			bubble.play("anim");
+			
+			endTimer = new Timer(3000, 1);
+			endTimer.addEventListener(TimerEvent.TIMER, nextScene);
+			endTimer.start();
 		}
 		
-		private function inhale():void
+		private function nextScene(e:TimerEvent):void
 		{
-			bubble.play("inhale");
-			SoundManager.playSound(SoundManager.SFX_INTRO_INHALE,0, exhale);
-		}
-		
-		private function exhale():void
-		{
-			++loopCount;
-			if (loopCount < 2)
-			{
-				bubble.play("exhale");
-				SoundManager.playSound(SoundManager.SFX_INTRO_EXHALE, 0, inhale);
-			}
-			else
-			{
-				IntroWorld(FP.world).nextScene();
-			}
+			endTimer = null;
+			IntroWorld(FP.world).nextScene();
 		}
 		
 	}
