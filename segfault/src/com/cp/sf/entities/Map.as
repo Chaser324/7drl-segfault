@@ -2,12 +2,17 @@ package com.cp.sf.entities
 {
 	import com.cp.sf.entities.rooms.Room;
 	import com.cp.sf.entities.rooms.SmallOffice;
-	import com.cp.sf.entities.terrain.Floor;
-	import com.cp.sf.entities.terrain.Wall;
 	import com.cp.sf.GC;
+	import com.cp.sf.GFX;
 	import com.cp.sf.Utils;
+	import com.cp.sf.worlds.GameWorld;
 	import net.flashpunk.Entity;
 	import net.flashpunk.FP;
+	import net.flashpunk.graphics.Graphiclist;
+	import net.flashpunk.graphics.Spritemap;
+	import net.flashpunk.Tween;
+	import net.flashpunk.tweens.misc.VarTween;
+	import net.flashpunk.utils.Ease;
 	
 	/**
 	 * ...
@@ -23,7 +28,9 @@ package com.cp.sf.entities
 		protected var firstRoom:Room;
 		protected var lastRoom:Room;
 		
-		public var terrainEntities:Array;		
+		public var terrainEntities:Array;
+		
+		protected var tweens:Array = new Array();
 		
 		// Number of blocks in height/width of a cell of room grid
 		protected var cell_height:int;
@@ -44,18 +51,50 @@ package com.cp.sf.entities
 		protected static const GRID_BUFFER:int = 0;
 		protected static const CELL_BUFFER:int = 4;
 		protected static const GRID_MIN_SIZE:int = 3;
-		protected static const MIN_RANDOM_CONNECTIONS = 5;
-		protected static const MAX_RANDOM_CONNECTIONS = 8;
+		protected static const MIN_RANDOM_CONNECTIONS:int = 5;
+		protected static const MAX_RANDOM_CONNECTIONS:int = 8;
 		
 		//} endregion
 		
 		//{ region Constructor
 		
 		public function Map() 
-		{			
+		{
 			buildMap();
 			
 			super();
+		}
+		
+		//} endregion
+		
+		//{ region Public Methods
+		
+		override public function update():void
+		{
+			super.update();
+		}
+		
+		public function getCell(cellX:int, cellY:int):String
+		{
+			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
+				return null
+			
+			return String(layout[cellY]).charAt(cellX);
+		}
+		
+		public function getCellObject(cellX:int, cellY:int):Object
+		{
+			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
+				return null
+			
+			return terrainEntities[cellY][cellX];
+		}
+		
+		public function openDoor(cellX:int, cellY:int):void
+		{
+			setCell(cellX, cellY, GC.MAP_DOOR_OPEN);
+			Graphiclist(graphic).remove(terrainEntities[cellY][cellX]);
+			drawOpenDoor(cellX, cellY);			
 		}
 		
 		//} endregion
@@ -69,9 +108,13 @@ package com.cp.sf.entities
 			generateEmptyMap();
 			placeRooms();
 			buildConnections();
+			
 			addWalls();
+			addDoors();
+			
 			drawMap();
 			placePlayer();
+			
 			//traceMap();
 		}
 		
@@ -474,18 +517,74 @@ package com.cp.sf.entities
 					
 					if (cell == GC.MAP_WALL)
 					{
-						terrainEntities[row][col] = new Wall(col, row);
-						ILitObject(terrainEntities[row][col]).light(0);
-						FP.world.add(terrainEntities[row][col]);
+						drawWall(col, row);
 					}
 					else if (cell == GC.MAP_FLOOR || cell == GC.MAP_HALLWAY)
 					{
-						terrainEntities[row][col] = new Floor(col, row);
-						ILitObject(terrainEntities[row][col]).light(0);
-						FP.world.add(terrainEntities[row][col]);
+						drawFloor(col, row);
+					}
+					else if (cell == GC.MAP_DOOR_CLOSED)
+					{
+						drawClosedDoor(col, row);
 					}
 				}
 			}
+		}
+		
+		private function drawWall(col:int, row:int):void
+		{
+			var wallImage:Spritemap = new Spritemap(GFX.GFX_TERRAIN, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			this.addGraphic(wallImage);
+			
+			wallImage.setFrame(getTilesheetCol(), 1);
+			wallImage.alpha = 0;
+			
+			wallImage.x = GC.MAP_CELL_SIZE * col;
+			wallImage.y = GC.MAP_CELL_SIZE * row;
+			
+			terrainEntities[row][col] = wallImage;
+		}
+		
+		private function drawFloor(col:int, row:int):void
+		{
+			var floorImage:Spritemap = new Spritemap(GFX.GFX_TERRAIN, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			this.addGraphic(floorImage);
+			
+			floorImage.setFrame(getTilesheetCol(), 0);
+			floorImage.alpha = 0;
+			
+			floorImage.x = GC.MAP_CELL_SIZE * col;
+			floorImage.y = GC.MAP_CELL_SIZE * row;
+			
+			terrainEntities[row][col] = floorImage;
+		}
+		
+		private function drawClosedDoor(col:int, row:int):void
+		{	
+			var doorImage:Spritemap = new Spritemap(GFX.GFX_TERRAIN, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			this.addGraphic(doorImage);
+			
+			doorImage.setFrame(0, 2);
+			doorImage.alpha = 0;
+			
+			doorImage.x = GC.MAP_CELL_SIZE * col;
+			doorImage.y = GC.MAP_CELL_SIZE * row;
+			
+			terrainEntities[row][col] = doorImage;
+		}
+		
+		private function drawOpenDoor(col:int, row:int):void
+		{
+			var doorImage:Spritemap = new Spritemap(GFX.GFX_TERRAIN, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			this.addGraphic(doorImage);
+			
+			doorImage.setFrame(1, 2);
+			doorImage.alpha = 0;
+			
+			doorImage.x = GC.MAP_CELL_SIZE * col;
+			doorImage.y = GC.MAP_CELL_SIZE * row;
+			
+			terrainEntities[row][col] = doorImage;
 		}
 		
 		private function addWalls():void
@@ -536,6 +635,54 @@ package com.cp.sf.entities
 			}
 		}
 		
+		private function addDoors():void
+		{
+			for (var row:int = 0; row < layout.length; row++)
+			{
+				for (var col:int = 0; col < layout[row].length; col++)
+				{
+					var selectedCell:String = getCell(col, row);
+					if (selectedCell == GC.MAP_FLOOR)
+					{
+						var neighbors:Array = new Array();
+						neighbors[0] = new MapPoint(col, row - 1);
+						neighbors[1] = new MapPoint(col + 1, row);
+						neighbors[2] = new MapPoint(col, row + 1);
+						neighbors[3] = new MapPoint(col - 1, row);
+						neighbors[4] = new MapPoint(col + 1, row - 1);
+						neighbors[5] = new MapPoint(col + 1, row + 1);
+						neighbors[6] = new MapPoint(col - 1, row + 1);
+						neighbors[7] = new MapPoint(col - 1, row - 1);
+						
+						var borderingFloorTiles:int = 0;
+						for each (var point:MapPoint in neighbors)
+						{
+							var neighborCell:String = getCell(point.x, point.y);
+							if (neighborCell == GC.MAP_DOOR_CLOSED)
+							{
+								borderingFloorTiles = 0;
+								break;
+							}
+							
+							if (neighborCell == GC.MAP_FLOOR || neighborCell == GC.MAP_HALLWAY)
+							{
+								++borderingFloorTiles;
+							}
+						}
+						
+						if (borderingFloorTiles == 3 || borderingFloorTiles == 4)
+						{
+							if ((getCell(neighbors[0].x, neighbors[0].y) == GC.MAP_WALL && getCell(neighbors[2].x, neighbors[2].y) == GC.MAP_WALL) ||
+							    (getCell(neighbors[1].x, neighbors[1].y) == GC.MAP_WALL && getCell(neighbors[3].x, neighbors[3].y) == GC.MAP_WALL))
+							{
+								setCell(col, row, GC.MAP_DOOR_CLOSED);
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		//} endregion
 		
 		//{ region Misc
@@ -544,6 +691,51 @@ package com.cp.sf.entities
 		{
 			var curRow:String = this.layout[cellY];
 			this.layout[cellY] = curRow.substr(0,cellX) + data + curRow.substr(cellX + 1);
+		}
+		
+		public function light(x:int, y:int, val:Number):void
+		{
+			var tile:Spritemap = terrainEntities[y][x];
+			
+			if (tile == null || tile.alpha == (val/100)) return;
+			
+			if (tile.alpha > 0 && val < 20) val = 20;
+			
+			if (tile.alpha == 0 && val > 0)
+			{
+				GameWorld(FP.world).revealMinimap(x, y, getCell(x,y));
+			}
+			
+			var lightTween:VarTween = new VarTween(null,Tween.ONESHOT);
+			lightTween.tween(tile, "alpha", (val / 100), 0.3, Ease.quadIn);
+			this.addTween(lightTween, true);
+			
+			//tile.alpha = val / 100;
+		}
+		
+		public function blocksLight(x:int, y:int):Boolean
+		{
+			var tile:String = getCell(x, y);
+			if (tile == GC.MAP_WALL || tile == GC.MAP_DOOR_CLOSED)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		private function getTilesheetCol():int
+		{
+			if (Math.random() > 0.97)
+			{
+				return Utils.randomRange(1, 6);
+			}
+			else
+			{
+				return 0;
+			}
 		}
 		
 		private function traceMap():void
@@ -559,25 +751,7 @@ package com.cp.sf.entities
 		
 		//} endregion
 		
-		//{ region Public Methods
 		
-		public function getCell(cellX:int, cellY:int):String
-		{
-			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
-				return null
-			
-			return String(layout[cellY]).charAt(cellX);
-		}
-		
-		public function getCellObject(cellX:int, cellY:int):Object
-		{
-			if (cellX < 0 || cellX >= mapWidth || cellY < 0 || cellY >= mapHeight) 
-				return null
-			
-			return terrainEntities[cellY][cellX];
-		}
-		
-		//} endregion
 		
 		//{ region Public Accessors
 		

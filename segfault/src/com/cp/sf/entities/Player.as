@@ -1,6 +1,5 @@
 package com.cp.sf.entities 
 {
-	import com.cp.sf.entities.terrain.Floor;
 	import com.cp.sf.GC;
 	import com.cp.sf.GFX;
 	import com.cp.sf.worlds.GameWorld;
@@ -19,6 +18,8 @@ package com.cp.sf.entities
 		private var playerMoving:Boolean = false;
 		private var target:MapPoint = null;
 		private var playerImg:Spritemap;
+		
+		private var actionDelay:Number = 0;
 		
 		public function Player(posX:int = 0, posY:int = 0) 
 		{
@@ -45,7 +46,9 @@ package com.cp.sf.entities
 		
 		private function processDirectionalInput():void
 		{
-			if (!playerMoving)
+			actionDelay = FP.approach(actionDelay,0,FP.elapsed);
+			
+			if (!playerMoving && actionDelay == 0)
 			{
 				this.target = null;
 				if (Input.check("up"))
@@ -79,11 +82,17 @@ package com.cp.sf.entities
 				
 				if (target)
 				{
-					var targetTerrain:Object = GameWorld(this.world).getMapTerrain(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
-					if (targetTerrain is Floor)
+					var targetTerrain:String = GameWorld(this.world).gameMap.getCell(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
+					if (targetTerrain == GC.MAP_FLOOR || targetTerrain == GC.MAP_DOOR_OPEN)
 					{
 						GameWorld(this.world).updatePlayerPosition(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 						playerMoving = true;
+					}
+					else if (targetTerrain == GC.MAP_DOOR_CLOSED)
+					{
+						GameWorld(this.world).gameMap.openDoor(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
+						GameWorld(this.world).updatePlayerPosition(this.mapX, this.mapY);
+						actionDelay = 0.4;
 					}
 				}
 			}

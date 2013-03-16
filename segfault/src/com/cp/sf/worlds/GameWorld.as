@@ -59,7 +59,7 @@ package com.cp.sf.worlds
 			this.add(minimap);
 			minimap.visible = false;
 			
-			lighting = new FOV(map.terrainEntities);
+			lighting = new FOV(map);
 			lighting.compute(player.mapX, player.mapY);
 			
 			fadeImage = new Image(new BitmapData(FP.width, FP.height, false, 0xFF000000));
@@ -80,14 +80,10 @@ package com.cp.sf.worlds
 		}
 		
 		public function updatePlayerPosition(x:int, y:int):void
-		{			
+		{
+			map.clearTweens();
 			lighting.compute(x, y);
 			minimap.updatePlayerPosition(new MapPoint(x, y));
-		}
-		
-		public function getMapTerrain(mapX:int, mapY:int):Object
-		{
-			return this.map.getCellObject(mapX, mapY);
 		}
 		
 		public function revealMinimap(mapX:int, mapY:int, tile:String):void
@@ -122,6 +118,11 @@ package com.cp.sf.worlds
 		private function fadeInComplete():void
 		{
 			fadeImage.visible = false;
+		}
+		
+		public function get gameMap():Map
+		{
+			return map;
 		}
 		
 	}

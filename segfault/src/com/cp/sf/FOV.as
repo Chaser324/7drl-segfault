@@ -1,6 +1,7 @@
 package com.cp.sf 
 {
 	import com.cp.sf.entities.ILitObject;
+	import com.cp.sf.entities.Map;
 	import net.flashpunk.Entity;
 	/**
 	 * ...
@@ -8,7 +9,7 @@ package com.cp.sf
 	 */
 	public class FOV 
 	{
-		private var terrain:Array;
+		private var map:Map;
 		private var terrainHeight:int;
 		private var terrainWidth:int;
 		
@@ -20,11 +21,11 @@ package com.cp.sf
 											[-1,  0]
 										];
 		
-		public function FOV(terrain:Array) 
+		public function FOV(map:Map) 
 		{
-			this.terrain = terrain;
-			terrainHeight = terrain.length;
-			terrainWidth = terrain[0].length;
+			this.map = map;
+			terrainHeight = map.mapHeight;
+			terrainWidth = map.mapWidth;
 		}
 		
 		public function compute(sx:int, sy:int):void
@@ -32,14 +33,14 @@ package com.cp.sf
 			var i:int;
 			
 			// paint it black
-			for (i = sx - 10; i < sx + 10; i++)
-			{
-				for (var j:int = sy - 10; j < sy + 10; j++)
-				{
-					if (j >= 0 && j < terrainHeight && i >= 0 && i < terrainWidth && terrain[j][i] && terrain[j][i] is ILitObject)
-						terrain[j][i].light(0);
-				}
-			}
+			//for (i = sx - 10; i < sx + 10; i++)
+			//{
+				//for (var j:int = sy - 10; j < sy + 10; j++)
+				//{
+					//if (j >= 0 && j < terrainHeight && i >= 0 && i < terrainWidth)
+						//map.light(i, j, 0);
+				//}
+			//}
 			
 			var doneCells:Array = new Array();
 			var litCells:Array = new Array();
@@ -53,16 +54,20 @@ package com.cp.sf
 			{
 				var x:int = i % terrainWidth;
 				var y:int = i / terrainWidth;
-				if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth && terrain[y][x] && terrain[y][x] is ILitObject)
+				if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth)
 				{
 					if (litCells[i] != null)
 					{
-						ILitObject(terrain[y][x]).light(litCells[i]);
+						map.light(x, y, litCells[i]);
+					}
+					else if (x != sx && y != sy)
+					{
+						map.light(x, y, 0);
 					}
 				}
 			}
 			
-			ILitObject(terrain[sy][sx]).light(100);
+			map.light(sx, sy, 100);
 		}
 		
 		private function emitLight(sx:int, sy:int, litCells:Array):void
@@ -222,8 +227,8 @@ package com.cp.sf
 		
 		private function lightPasses(x:int, y:int):Boolean
 		{
-			if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth && terrain[y][x])
-				return !(terrain[y][x].blocksLight());
+			if (y >= 0 && y < terrainHeight && x >= 0 && x < terrainWidth)
+				return !(map.blocksLight(x,y));
 			else
 				return false;
 		}

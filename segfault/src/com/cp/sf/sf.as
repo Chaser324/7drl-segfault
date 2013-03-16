@@ -15,12 +15,11 @@ package com.cp.sf
 
 	import flash.ui.ContextMenu;
 
-	
 	/**
 	 * 
 	 */
 	[SWF(width = '800', height = '600', backgroundColor = '#000000')]
-	// TODO - [Frame(factoryClass = "com.cp.sf.Preloader")]
+	[Frame(factoryClass = "com.cp.sf.Preloader")]
 	public class sf extends Engine
 	{		
 		public function sf() 
@@ -61,7 +60,7 @@ package com.cp.sf
 			contextMenu.hideBuiltInItems();
 
 			// TODO: Insert site-locking code here.
-			FP.world = new GameWorld();
+			FP.world = new TitleWorld();
 
 			//SoundManager.i.currentMusic = SoundManager.i.menuMusic;
 		}
