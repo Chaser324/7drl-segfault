@@ -2,6 +2,7 @@ package com.cp.sf.entities
 {
 	import com.cp.sf.GC;
 	import com.cp.sf.GFX;
+	import com.cp.sf.SoundManager;
 	import com.cp.sf.worlds.GameWorld;
 	import net.flashpunk.Entity;
 	import net.flashpunk.FP;
@@ -87,6 +88,7 @@ package com.cp.sf.entities
 					{
 						GameWorld(this.world).updatePlayerPosition(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 						playerMoving = true;
+						SoundManager.playSound(SoundManager.SFX_STEPS);
 					}
 					else if (targetTerrain == GC.MAP_DOOR_CLOSED)
 					{

@@ -1,6 +1,7 @@
 package com.cp.sf 
 {
 	import com.cp.sf.Preloader;
+	import com.cp.sf.worlds.CharCreateWorld;
 	import com.cp.sf.worlds.GameWorld;
 	import com.cp.sf.worlds.TitleWorld;
 	import flash.display.StageDisplayState;
@@ -19,7 +20,7 @@ package com.cp.sf
 	 * 
 	 */
 	[SWF(width = '800', height = '600', backgroundColor = '#000000')]
-	[Frame(factoryClass = "com.cp.sf.Preloader")]
+	// TODO - [Frame(factoryClass = "com.cp.sf.Preloader")]
 	public class sf extends Engine
 	{		
 		public function sf() 
@@ -61,8 +62,6 @@ package com.cp.sf
 
 			// TODO: Insert site-locking code here.
 			FP.world = new TitleWorld();
-
-			//SoundManager.i.currentMusic = SoundManager.i.menuMusic;
 		}
 		
 		override public function setStageProperties():void

@@ -6,6 +6,8 @@ package ui
 		
 		public var callback:Function = null
 		
+		public var selected:String = "";
+		
 		public function RadioButtonGroup(callback:Function = null, ...buttons) 
 		{
 			this.callback = callback;
@@ -79,6 +81,8 @@ package ui
 			
 			for each(var b:RadioButton in buttons) b.checked = false;
 			target.checked = true;
+			
+			selected = target.data;
 		}
 	}
 }

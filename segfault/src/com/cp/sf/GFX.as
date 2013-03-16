@@ -12,6 +12,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/fonts/cour.ttf", embedAsCFF="false", fontFamily="Courier")]
 		public static const GFX_FONT_COURIER:Class;
 		
+		[Embed(source="../../../../assets/fonts/Pacifico.ttf", embedAsCFF="false", fontFamily="Pacifico")]
+		public static const GFX_FONT_PACIFICO:Class;
+		
 		/**
 		 * TEXT
 		 */
@@ -146,7 +149,11 @@ package com.cp.sf
 		 * CHARACTER CREATE
 		 */
 		
+		[Embed(source="../../../../assets/gfx/menu/character-create.png")]
+		public static const GFX_CREATE_MENU_BG:Class;
 		
+		[Embed(source="../../../../assets/gfx/menu/character-screen-done.png")]
+		public static const GFX_CREATE_DONE_BUTTON:Class;
 	}
 
 }

@@ -11,7 +11,7 @@ package ui
 			this.checked = checked;
 		}
 		
-		override protected function click():void 
+		override public function click():void 
 		{
 			checked = !checked;
 			

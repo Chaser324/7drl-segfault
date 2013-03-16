@@ -4,6 +4,7 @@ package com.cp.sf.entities
 	import com.cp.sf.entities.rooms.SmallOffice;
 	import com.cp.sf.GC;
 	import com.cp.sf.GFX;
+	import com.cp.sf.SoundManager;
 	import com.cp.sf.Utils;
 	import com.cp.sf.worlds.GameWorld;
 	import net.flashpunk.Entity;
@@ -94,7 +95,8 @@ package com.cp.sf.entities
 		{
 			setCell(cellX, cellY, GC.MAP_DOOR_OPEN);
 			Graphiclist(graphic).remove(terrainEntities[cellY][cellX]);
-			drawOpenDoor(cellX, cellY);			
+			drawOpenDoor(cellX, cellY);
+			SoundManager.playSound(SoundManager.SFX_DOOR);
 		}
 		
 		//} endregion
