@@ -50,6 +50,7 @@ package com.cp.sf
 			Input.define("left", Key.A, Key.LEFT);
 			Input.define("right", Key.D, Key.RIGHT);
 			Input.define("down", Key.S, Key.DOWN);
+			Input.define("wait", Key.SPACE);
 			
 			Input.define("map", Key.M);
 			
@@ -61,7 +62,7 @@ package com.cp.sf
 			contextMenu.hideBuiltInItems();
 
 			// TODO: Insert site-locking code here.
-			FP.world = new TitleWorld();
+			FP.world = new GameWorld();
 		}
 		
 		override public function setStageProperties():void

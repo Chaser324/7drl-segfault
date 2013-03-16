@@ -1,5 +1,7 @@
 package com.cp.sf.entities 
 {
+	import com.cp.sf.entities.enemies.Blender;
+	import com.cp.sf.entities.enemies.Enemy;
 	import com.cp.sf.entities.rooms.Room;
 	import com.cp.sf.entities.rooms.SmallOffice;
 	import com.cp.sf.GC;
@@ -44,6 +46,8 @@ package com.cp.sf.entities
 		protected var playerStartPos:MapPoint;
 		
 		protected var buildDone:Boolean;
+		
+		protected var enemyList:Array;
 		
 		//} endregion
 		
@@ -116,6 +120,9 @@ package com.cp.sf.entities
 			
 			drawMap();
 			placePlayer();
+			
+			buildEnemyList();
+			placeEnemies();
 			
 			//traceMap();
 		}
@@ -493,6 +500,8 @@ package com.cp.sf.entities
 				setCell(exit.x, exit.y, GC.MAP_HALLWAY);
 			}
 			
+			
+			// Reset our hallway cells to normal floor cells so it doesn't disrupt next pathfinding.
 			for (var row:int = 0; row <= mapHeight; row++)
 			{
 				for (var col:int = 0; col <= mapWidth; col++)
@@ -685,6 +694,46 @@ package com.cp.sf.entities
 			}
 		}
 		
+		private function buildEnemyList():void
+		{
+			enemyList = new Array();
+			enemyList.push(new Blender());
+			enemyList.push(new Blender());
+			enemyList.push(new Blender());
+			enemyList.push(new Blender());
+			enemyList.push(new Blender());
+			enemyList.push(new Blender());
+		}
+		
+		private function placeEnemies():void
+		{
+			while (enemyList.length > 0)
+			{
+				var e:Enemy = enemyList.pop();
+				var r:Room = firstRoom;
+				var tile:String = "";
+				var enemyStartPos:MapPoint = new MapPoint();
+				
+				// pick a room the player doesn't start in
+				while (r == firstRoom)
+				{
+					r = rooms[Utils.randomRange(0, rooms.length - 1)];
+				}
+				
+				while (tile != GC.MAP_FLOOR)
+				{
+					enemyStartPos.x = r.mapX + Utils.randomRange(0, r.roomWidth - 1);
+					enemyStartPos.y = r.mapY + Utils.randomRange(0, r.roomHeight - 1);
+					tile = getCell(enemyStartPos.x, enemyStartPos.y);
+				}
+				
+				e.x = enemyStartPos.x * GC.MAP_CELL_SIZE;
+				e.y = enemyStartPos.y * GC.MAP_CELL_SIZE;
+				
+				GameWorld(FP.world).addEnemy(e);
+			}
+		}
+		
 		//} endregion
 		
 		//{ region Misc
@@ -715,6 +764,11 @@ package com.cp.sf.entities
 			//tile.alpha = val / 100;
 		}
 		
+		public function getCellVisibility(cellX:int, cellY:int):Number
+		{
+			return terrainEntities[cellY][cellX].alpha;
+		}
+		
 		public function blocksLight(x:int, y:int):Boolean
 		{
 			var tile:String = getCell(x, y);
@@ -732,7 +786,7 @@ package com.cp.sf.entities
 		{
 			if (Math.random() > 0.97)
 			{
-				return Utils.randomRange(1, 6);
+				return Utils.randomRange(1, 5);
 			}
 			else
 			{

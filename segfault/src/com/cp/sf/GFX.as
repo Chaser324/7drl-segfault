@@ -32,6 +32,9 @@ package com.cp.sf
 		[Embed(source = "../../../../assets/gfx/player.png")]
 		public static const GFX_PLAYER:Class;
 		
+		[Embed(source = "../../../../assets/gfx/enemies.png")]
+		public static const GFX_ENEMY:Class;
+		
 		/**
 		 * UI
 		 */

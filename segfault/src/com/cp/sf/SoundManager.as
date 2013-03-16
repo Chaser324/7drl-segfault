@@ -39,6 +39,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/sfx/door.mp3")]
 		public static const SFX_DOOR:Class;
 		
+		[Embed(source="../../../../assets/sfx/hit.mp3")]
+		public static const SFX_ENEMY_HIT:Class;
+		
 		/**
 		 * MUSIC INSTNANTIATIONS
 		 */

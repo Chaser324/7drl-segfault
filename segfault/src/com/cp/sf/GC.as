@@ -14,9 +14,8 @@ package com.cp.sf
 		public static const MAP_HEIGHT_MAX:int = 128; // Max height in cells of a map
 		public static const MAP_HEIGHT_MIN:int = 96; // Min height in cells of a map
 		
-		public static const ENTITY_WALL_TYPE:String = "wall";
-		public static const ENTITY_FLOOR_TYPE:String = "floor";
-		public static const ENTITY_PLAYER_TYPE:String = "player";
+		public static const TYPE_PLAYER:String = "player";
+		public static const TYPE_ENEMY:String = "enemy";
 		
 		public static const CAMERA_OFFSET:Number = 10;
 		public static const CAMERA_MAX_SPEED:Number = 5;

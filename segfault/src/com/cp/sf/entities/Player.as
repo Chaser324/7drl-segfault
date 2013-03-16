@@ -28,7 +28,7 @@ package com.cp.sf.entities
 			this.addGraphic(playerImg);
 			playerImg.setFrame(0, 0);
 			
-			this.type = GC.ENTITY_PLAYER_TYPE;
+			this.type = GC.TYPE_PLAYER;
 			
 			this.x = GC.MAP_CELL_SIZE * posX;
 			this.y = GC.MAP_CELL_SIZE * posY;
@@ -80,12 +80,29 @@ package com.cp.sf.entities
 						playerImg.x = 0;
 					}
 				}
+				else if (Input.check("wait"))
+				{
+					GameWorld(this.world).updatePlayerPosition(this.mapX, this.mapY);
+					actionDelay = 0.4;
+				}
 				
 				if (target)
 				{
 					var targetTerrain:String = GameWorld(this.world).gameMap.getCell(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
-					if (targetTerrain == GC.MAP_FLOOR || targetTerrain == GC.MAP_DOOR_OPEN)
+					var occupiedCell:String = GameWorld(this.world).cellOccupied(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
+					if (occupiedCell != null)
 					{
+						if (occupiedCell == GC.TYPE_ENEMY)
+						{
+							GameWorld(this.world).attackEnemy(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE, 5, 1.0);
+							actionDelay = 0.4;
+						}
+					}
+					else if (targetTerrain == GC.MAP_FLOOR || targetTerrain == GC.MAP_DOOR_OPEN)
+					{
+						GameWorld(this.world).vacate(this.mapX, this.mapY);
+						GameWorld(this.world).occupy(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE, this.type);
+						
 						GameWorld(this.world).updatePlayerPosition(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 						playerMoving = true;
 						SoundManager.playSound(SoundManager.SFX_STEPS);
