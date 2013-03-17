@@ -20,7 +20,7 @@ package com.cp.sf.entities.char_create
 	 */
 	public class CharNameInput extends TextInput 
 	{
-		protected var textFont:Class = GFX.GFX_FONT_COURIER;
+		protected var textFont:Class = GFX.GFX_FONT_PACIFICO;
 		
 		protected var t:TextField;
 		protected var tf:TextFormat;

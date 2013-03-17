@@ -12,6 +12,11 @@ package com.cp.sf
 		public static var crosshairY:Number;
 		
 		public static var fullscreen:Boolean;
+		
+		
+		
+		public static var floors:int;
+		public static var kills:int;
 	}
 
 }

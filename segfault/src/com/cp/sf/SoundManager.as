@@ -23,6 +23,9 @@ package com.cp.sf
 		[Embed(source="../../../../assets/music/char_create.mp3")]
 		public static const MUSIC_CHAR_CREATE:Class;
 		
+		[Embed(source="../../../../assets/music/gameover.mp3")]
+		public static const MUSIC_GAMEOVER:Class;
+		
 		/**
 		 * SOUND EFFECT EMBEDS
 		 */
@@ -42,6 +45,12 @@ package com.cp.sf
 		[Embed(source="../../../../assets/sfx/hit.mp3")]
 		public static const SFX_ENEMY_HIT:Class;
 		
+		[Embed(source="../../../../assets/sfx/die.mp3")]
+		public static const SFX_ENEMY_DIE:Class;
+		
+		[Embed(source="../../../../assets/sfx/gameover.mp3")]
+		public static const SFX_GAMEOVER:Class;
+		
 		/**
 		 * MUSIC INSTNANTIATIONS
 		 */
@@ -50,6 +59,7 @@ package com.cp.sf
 		public static var music_intro:Sfx = new Sfx(MUSIC_INTRO);
 		public static var music_floor1:Sfx = new Sfx(MUSIC_FLOOR_1);
 		public static var music_char_create:Sfx = new Sfx(MUSIC_CHAR_CREATE);
+		public static var music_gameover:Sfx = new Sfx(MUSIC_GAMEOVER);
 		
 		
 		private static var _currentMusic:Sfx;

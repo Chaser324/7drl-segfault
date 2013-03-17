@@ -2,6 +2,7 @@ package com.cp.sf
 {
 	import com.cp.sf.Preloader;
 	import com.cp.sf.worlds.CharCreateWorld;
+	import com.cp.sf.worlds.GameOverWorld;
 	import com.cp.sf.worlds.GameWorld;
 	import com.cp.sf.worlds.TitleWorld;
 	import flash.display.StageDisplayState;

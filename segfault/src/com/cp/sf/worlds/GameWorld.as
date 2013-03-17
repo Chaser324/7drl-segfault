@@ -10,12 +10,17 @@ package com.cp.sf.worlds
 	import com.cp.sf.GC;
 	import com.cp.sf.GV;
 	import com.cp.sf.SoundManager;
+	import com.cp.sf.Utils;
 	import flash.display.BitmapData;
 	import net.flashpunk.FP;
+	import net.flashpunk.graphics.Graphiclist;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.tweens.misc.VarTween;
 	import net.flashpunk.utils.Ease;
 	import net.flashpunk.World;
+	import punk.fx.effects.RGBDisplacementFX;
+	import punk.fx.effects.ScanLinesFX;
+	import punk.fx.graphics.FXImage;
 	
 	/**
 	 * ...
@@ -27,6 +32,15 @@ package com.cp.sf.worlds
 		protected var player:Player;
 		protected var ui:GameUI;
 		protected var minimap:Minimap;
+		
+		protected var playerHitImage:FXImage;
+		protected var playerHitEffect:RGBDisplacementFX;
+		protected var redTweenX:VarTween;
+		protected var blueTweenX:VarTween;
+		protected var greenTweenX:VarTween;
+		protected var redTweenY:VarTween;
+		protected var blueTweenY:VarTween;
+		protected var greenTweenY:VarTween;
 		
 		protected var fadeImage:Image;
 		
@@ -49,6 +63,9 @@ package com.cp.sf.worlds
 		
 		override public function begin():void
 		{
+			GV.floors = 1;
+			GV.kills = 0;
+			
 			ui = new GameUI();
 			ui.layer = 0;
 			this.add(ui);
@@ -60,6 +77,14 @@ package com.cp.sf.worlds
 			player = new Player(map.playerStartPosition.x, map.playerStartPosition.y);
 			player.layer = 5;
 			this.add(player);
+			
+			playerHitImage = new FXImage();
+			playerHitEffect = new RGBDisplacementFX();
+			playerHitImage.effects.add(playerHitEffect);
+			playerHitImage.scrollX = 0;
+			playerHitImage.scrollY = 0;
+			this.addGraphic(playerHitImage, -1);
+			playerHitImage.visible = false;
 			
 			minimap = new Minimap(map.mapHeight, map.mapWidth);
 			minimap.layer = 0;
@@ -125,6 +150,94 @@ package com.cp.sf.worlds
 					e.hit(damage, chance);
 				}
 			}
+		}
+		
+		public function attackPlayer(damage:int, chance:Number):void
+		{
+			if (Math.random() <= chance)
+			{
+				player.health -= damage;
+				
+				if (player.health <= 0) 
+				{
+					gameover();
+				}
+				else
+				{
+					SoundManager.playSound(SoundManager.SFX_ENEMY_HIT);
+					playerHit();
+				}
+			}
+		}
+		
+		private function playerHit():void
+		{
+			this.clearTweens();
+			playerHitImage.visible = true;
+			
+			Utils.quake.start(0.5, 0.3);
+			
+			playerHitEffect.redOffsetX = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			playerHitEffect.greenOffsetX = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			playerHitEffect.blueOffsetX = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			
+			playerHitEffect.redOffsetY = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			playerHitEffect.greenOffsetY = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			playerHitEffect.blueOffsetY = Utils.randomRange(5,10) * (Math.random() > 0.5? 1 : -1);
+			
+			redTweenX = new VarTween(stopPlayerHitEffect);
+			greenTweenX = new VarTween();
+			blueTweenX = new VarTween();
+			redTweenY = new VarTween();
+			greenTweenY = new VarTween();
+			blueTweenY = new VarTween();
+			
+			redTweenX.tween(playerHitEffect, "redOffsetX", 0, Utils.randomRange(0.1, 0.3, true));
+			greenTweenX.tween(playerHitEffect, "greenOffsetX", 0, Utils.randomRange(0.1, 0.3, true));
+			blueTweenX.tween(playerHitEffect, "blueOffsetX", 0, Utils.randomRange(0.1, 0.3, true));
+			redTweenY.tween(playerHitEffect, "redOffsetY", 0, Utils.randomRange(0.1, 0.3, true));
+			greenTweenY.tween(playerHitEffect, "greenOffsetY", 0, Utils.randomRange(0.1, 0.3, true));
+			blueTweenY.tween(playerHitEffect, "blueOffsetY", 0, Utils.randomRange(0.1, 0.3, true));
+			
+			this.addTween(redTweenX);
+			this.addTween(greenTweenX);
+			this.addTween(blueTweenX);
+			this.addTween(redTweenY);
+			this.addTween(greenTweenY);
+			this.addTween(blueTweenY);
+		}
+		
+		private function stopPlayerHitEffect():void
+		{
+			playerHitImage.visible = false;
+		}
+		
+		private function gameover():void
+		{
+			player.active = false;
+			
+			SoundManager.playSound(SoundManager.SFX_GAMEOVER);
+			
+			fadeImage = new Image(new BitmapData(FP.width, FP.height, false, 0xFFFF0000));
+			fadeImage.scrollX = 0;
+			fadeImage.scrollY = 0;
+			fadeImage.alpha = 0.5;
+			addGraphic(fadeImage, -1);
+			
+			this.clearTweens();
+			fadeTween = new VarTween();
+			fadeTween.tween(fadeImage, "alpha", 1.0, 1.5, Ease.quadIn);
+			this.addTween(fadeTween);
+			
+			fadeMusicTween = new VarTween(goToTitle);
+			fadeMusicTween.tween(SoundManager.currentMusic, "volume", 0, 1.5, Ease.quadIn);
+			this.addTween(fadeMusicTween);
+		}
+		
+		private function goToTitle():void
+		{
+			this.removeAll();
+			FP.world = new GameOverWorld();
 		}
 		
 		private function updateEnemyVisibility():void

@@ -22,8 +22,16 @@ package com.cp.sf.entities
 		
 		private var actionDelay:Number = 0;
 		
+		public var health;
+		public var experience;
+		public var level;
+		
 		public function Player(posX:int = 0, posY:int = 0) 
 		{
+			health = 100;
+			experience = 0;
+			level = 1;
+			
 			playerImg = new Spritemap(GFX.GFX_PLAYER, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
 			this.addGraphic(playerImg);
 			playerImg.setFrame(0, 0);
@@ -95,6 +103,7 @@ package com.cp.sf.entities
 						if (occupiedCell == GC.TYPE_ENEMY)
 						{
 							GameWorld(this.world).attackEnemy(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE, 5, 1.0);
+							GameWorld(this.world).updatePlayerPosition(target.x / GC.MAP_CELL_SIZE, target.y / GC.MAP_CELL_SIZE);
 							actionDelay = 0.4;
 						}
 					}

@@ -157,6 +157,23 @@ package com.cp.sf
 		
 		[Embed(source="../../../../assets/gfx/menu/character-screen-done.png")]
 		public static const GFX_CREATE_DONE_BUTTON:Class;
+		
+		/**
+		 * GAME OVER
+		 */
+		
+		[Embed(source = "../../../../assets/gfx/gameover/gameover-accept-button.png")]
+		public static const GFX_GAMEOVER_ACCEPT:Class;
+		
+		[Embed(source = "../../../../assets/gfx/gameover/gameover-bg.png")]
+		public static const GFX_GAMEOVER_BG:Class;
+		
+		[Embed(source = "../../../../assets/gfx/gameover/gameover-heading.png")]
+		public static const GFX_GAMEOVER_HEADING:Class;
+		
+		[Embed(source = "../../../../assets/gfx/gameover/gameover-textbox.png")]
+		public static const GFX_GAMEOVER_TEXTBOX:Class;
+		
 	}
 
 }
