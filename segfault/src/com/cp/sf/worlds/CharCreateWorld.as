@@ -4,6 +4,7 @@ package com.cp.sf.worlds
 	import com.cp.sf.entities.char_create.CharNameInput;
 	import com.cp.sf.entities.char_create.CharRadioButton;
 	import com.cp.sf.GFX;
+	import com.cp.sf.GV;
 	import com.cp.sf.SoundManager;
 	import net.flashpunk.FP;
 	import net.flashpunk.graphics.Image;
@@ -39,8 +40,8 @@ package com.cp.sf.worlds
 			add(nameInput);
 			
 			genderGroup = new RadioButtonGroup();
-			add(new CharRadioButton(229, 166, genderGroup, "test", 25,25));
-			add(new CharRadioButton(345, 166, genderGroup, "test2", 25, 25));
+			add(new CharRadioButton(229, 166, genderGroup, "male", 25,25));
+			add(new CharRadioButton(345, 166, genderGroup, "female", 25, 25));
 			
 			q1Group = new RadioButtonGroup();			
 			add(new CharRadioButton(402, 285, q1Group, "", 25,25));
@@ -92,6 +93,7 @@ package com.cp.sf.worlds
 		
 		private function nextScene():void
 		{
+			GV.playerGender = genderGroup.selected;
 			FP.world = new IntroWorld(6);
 		}
 		

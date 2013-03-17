@@ -1,6 +1,5 @@
 package com.cp.sf 
 {
-	import com.cp.sf.entities.ILitObject;
 	import com.cp.sf.entities.Map;
 	import net.flashpunk.Entity;
 	/**

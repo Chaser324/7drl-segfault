@@ -51,6 +51,12 @@ package com.cp.sf
 		[Embed(source="../../../../assets/sfx/gameover.mp3")]
 		public static const SFX_GAMEOVER:Class;
 		
+		[Embed(source="../../../../assets/sfx/stairs.mp3")]
+		public static const SFX_STAIRS:Class;
+		
+		[Embed(source="../../../../assets/sfx/levelup.mp3")]
+		public static const SFX_LEVELUP:Class;
+		
 		/**
 		 * MUSIC INSTNANTIATIONS
 		 */

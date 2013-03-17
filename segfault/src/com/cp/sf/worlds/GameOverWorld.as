@@ -90,7 +90,21 @@ package com.cp.sf.worlds
 			bgTimer.addEventListener(TimerEvent.TIMER, glitchBg);
 			bgTimer.start();
 			
+			fadeOut = new Image(new BitmapData(800, 600, false, 0xFF000000));
+			fadeOut.alpha = 1;
+			addGraphic(fadeOut, -1);
+			
 			SoundManager.currentMusic = SoundManager.music_gameover;
+			SoundManager.currentMusic.volume = 0;
+			
+			this.clearTweens();
+			fadeTween = new VarTween();
+			fadeTween.tween(fadeOut, "alpha", 0.0, 1.5, Ease.quadIn);
+			this.addTween(fadeTween);
+			
+			soundFadeTween = new VarTween();
+			soundFadeTween.tween(SoundManager.currentMusic, "volume", GV.volumeMusic, 1.5, Ease.quadIn);
+			this.addTween(soundFadeTween);
 		}
 		
 		private function createTextfield(text:String):void
@@ -148,10 +162,6 @@ package com.cp.sf.worlds
 			
 			acceptButton.active = false;
 			
-			fadeOut = new Image(new BitmapData(800, 600, false, 0xFF000000));
-			fadeOut.alpha = 0;
-			addGraphic(fadeOut, -1);
-			
 			this.clearTweens();
 			fadeTween = new VarTween();
 			fadeTween.tween(fadeOut, "alpha", 1.0, 1.5, Ease.quadIn);
@@ -164,7 +174,7 @@ package com.cp.sf.worlds
 		
 		private function goToTitle():void
 		{
-			FP.world = new TitleWorld();
+			FP.world = new GameWorld();
 		}
 		
 	}

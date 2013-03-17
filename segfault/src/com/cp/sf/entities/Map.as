@@ -2,10 +2,13 @@ package com.cp.sf.entities
 {
 	import com.cp.sf.entities.enemies.Blender;
 	import com.cp.sf.entities.enemies.Enemy;
+	import com.cp.sf.entities.enemies.Lamp;
+	import com.cp.sf.entities.enemies.Toaster;
 	import com.cp.sf.entities.rooms.Room;
 	import com.cp.sf.entities.rooms.SmallOffice;
 	import com.cp.sf.GC;
 	import com.cp.sf.GFX;
+	import com.cp.sf.GV;
 	import com.cp.sf.SoundManager;
 	import com.cp.sf.Utils;
 	import com.cp.sf.worlds.GameWorld;
@@ -117,6 +120,7 @@ package com.cp.sf.entities
 			
 			addWalls();
 			addDoors();
+			placeStairs();
 			
 			drawMap();
 			placePlayer();
@@ -180,7 +184,8 @@ package com.cp.sf.entities
 		private function buildRoomList():void
 		{
 			rooms = new Array();
-			for (var i:int = 0; i < Utils.randomRange(12, 15); i++)
+			var cnt:int = Utils.randomRange(12 + GV.floors, 15 + GV.floors);
+			for (var i:int = 0; i < cnt; i++)
 			{
 				rooms.push(new SmallOffice());
 			}
@@ -538,6 +543,10 @@ package com.cp.sf.entities
 					{
 						drawClosedDoor(col, row);
 					}
+					else if (cell == GC.MAP_STAIRS)
+					{
+						drawStairs(col, row);
+					}
 				}
 			}
 		}
@@ -596,6 +605,20 @@ package com.cp.sf.entities
 			doorImage.y = GC.MAP_CELL_SIZE * row;
 			
 			terrainEntities[row][col] = doorImage;
+		}
+		
+		private function drawStairs(col:int, row:int):void
+		{
+			var stairsImage:Spritemap = new Spritemap(GFX.GFX_TERRAIN, GC.MAP_CELL_SIZE, GC.MAP_CELL_SIZE);
+			this.addGraphic(stairsImage);
+			
+			stairsImage.setFrame(2, 2);
+			stairsImage.alpha = 0;
+			
+			stairsImage.x = GC.MAP_CELL_SIZE * col;
+			stairsImage.y = GC.MAP_CELL_SIZE * row;
+			
+			terrainEntities[row][col] = stairsImage;
 		}
 		
 		private function addWalls():void
@@ -697,12 +720,18 @@ package com.cp.sf.entities
 		private function buildEnemyList():void
 		{
 			enemyList = new Array();
-			enemyList.push(new Blender());
-			enemyList.push(new Blender());
-			enemyList.push(new Blender());
-			enemyList.push(new Blender());
-			enemyList.push(new Blender());
-			enemyList.push(new Blender());
+			
+			var i:int;
+			var cnt:int;
+			
+			cnt = Utils.randomRange((GV.floors + 1), 2 * (GV.floors + 1));
+			for (i = 0; i < cnt; i++) enemyList.push(new Blender());
+			
+			cnt = Utils.randomRange((GV.floors + 1), 2 * (GV.floors + 1));
+			for (i = 0; i < cnt; i++) enemyList.push(new Toaster());
+			
+			cnt = Utils.randomRange((GV.floors + 1), 2 * (GV.floors + 1));
+			for (i = 0; i < cnt; i++) enemyList.push(new Lamp());
 		}
 		
 		private function placeEnemies():void
@@ -732,6 +761,36 @@ package com.cp.sf.entities
 				
 				GameWorld(FP.world).addEnemy(e);
 			}
+		}
+		
+		private function placeStairs():void
+		{
+			var tile:String = "";
+			var stairPos:MapPoint = new MapPoint();
+			
+			while (tile != GC.MAP_FLOOR)
+			{
+				stairPos.x = lastRoom.mapX + Utils.randomRange(0, lastRoom.roomWidth - 1);
+				stairPos.y = lastRoom.mapY + Utils.randomRange(0, lastRoom.roomHeight - 1);
+				tile = getCell(stairPos.x, stairPos.y);
+				
+				var neighbors:Array = new Array();
+				neighbors[0] = new MapPoint(stairPos.x, stairPos.y - 1);
+				neighbors[1] = new MapPoint(stairPos.x + 1, stairPos.y);
+				neighbors[2] = new MapPoint(stairPos.x, stairPos.y + 1);
+				neighbors[3] = new MapPoint(stairPos.x - 1, stairPos.y);
+				
+				for each (var m:MapPoint in neighbors)
+				{
+					if (getCell(m.x, m.y) == GC.MAP_DOOR_CLOSED)
+					{
+						tile = "";
+						break;
+					}
+				}
+			}
+			
+			setCell(stairPos.x, stairPos.y, GC.MAP_STAIRS);
 		}
 		
 		//} endregion
@@ -806,8 +865,6 @@ package com.cp.sf.entities
 		//} endregion
 		
 		//} endregion
-		
-		
 		
 		//{ region Public Accessors
 		

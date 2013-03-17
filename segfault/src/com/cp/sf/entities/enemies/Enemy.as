@@ -4,6 +4,7 @@ package com.cp.sf.entities.enemies
 	import com.cp.sf.GC;
 	import com.cp.sf.GV;
 	import com.cp.sf.SoundManager;
+	import com.cp.sf.Utils;
 	import com.cp.sf.worlds.GameWorld;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
@@ -21,7 +22,9 @@ package com.cp.sf.entities.enemies
 	{
 		protected var health:int;
 		protected var baseDamage:int;
+		protected var chanceToHit:int;
 		protected var level:int;
+		protected var xp:int;
 		
 		protected var enemyImg:FXSpritemap;
 		
@@ -140,6 +143,7 @@ package com.cp.sf.entities.enemies
 			GV.kills += 1;
 			SoundManager.playSound(SoundManager.SFX_ENEMY_DIE);
 			GameWorld(FP.world).vacate(this.mapX, this.mapY);
+			GameWorld(FP.world).grantPlayerXp(xp);
 			FP.world.remove(this);
 		}
 		
@@ -160,7 +164,7 @@ package com.cp.sf.entities.enemies
 		
 		private function attack():void
 		{
-			GameWorld(FP.world).attackPlayer(baseDamage, 0.7);
+			GameWorld(FP.world).attackPlayer(baseDamage, (chanceToHit/100));
 		}
 		
 		private function stopHitEffect(e:TimerEvent):void

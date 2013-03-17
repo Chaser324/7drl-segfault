@@ -1,13 +1,10 @@
 package com.cp.sf 
 {
-	import com.cp.sf.Preloader;
-	import com.cp.sf.worlds.CharCreateWorld;
-	import com.cp.sf.worlds.GameOverWorld;
-	import com.cp.sf.worlds.GameWorld;
 	import com.cp.sf.worlds.TitleWorld;
 	import flash.display.StageDisplayState;
 	import flash.display.StageQuality;
 	import flash.events.FullScreenEvent;
+	import flash.ui.ContextMenu;
 	import net.flashpunk.Engine;
 	import net.flashpunk.FP;
 	import net.flashpunk.graphics.Text;
@@ -15,13 +12,12 @@ package com.cp.sf
 	import net.flashpunk.utils.Input;
 	import net.flashpunk.utils.Key;
 
-	import flash.ui.ContextMenu;
 
 	/**
 	 * 
 	 */
 	[SWF(width = '800', height = '600', backgroundColor = '#000000')]
-	// TODO - [Frame(factoryClass = "com.cp.sf.Preloader")]
+	[Frame(factoryClass = "com.cp.sf.Preloader")]
 	public class sf extends Engine
 	{		
 		public function sf() 
@@ -63,7 +59,7 @@ package com.cp.sf
 			contextMenu.hideBuiltInItems();
 
 			// TODO: Insert site-locking code here.
-			FP.world = new GameWorld();
+			FP.world = new TitleWorld();
 		}
 		
 		override public function setStageProperties():void

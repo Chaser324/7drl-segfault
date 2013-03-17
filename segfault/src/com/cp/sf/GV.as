@@ -17,6 +17,8 @@ package com.cp.sf
 		
 		public static var floors:int;
 		public static var kills:int;
+		
+		public static var playerGender:String = "male";
 	}
 
 }

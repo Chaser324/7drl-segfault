@@ -1,6 +1,7 @@
 package com.cp.sf.worlds 
 {
 	import com.cp.sf.entities.enemies.Enemy;
+	import com.cp.sf.entities.FloorTransition;
 	import com.cp.sf.entities.Map;
 	import com.cp.sf.entities.MapPoint;
 	import com.cp.sf.entities.Player;
@@ -30,8 +31,9 @@ package com.cp.sf.worlds
 	{
 		protected var map:Map;
 		protected var player:Player;
-		protected var ui:GameUI;
+		public var ui:GameUI;
 		protected var minimap:Minimap;
+		protected var floorTransition:FloorTransition;
 		
 		protected var playerHitImage:FXImage;
 		protected var playerHitEffect:RGBDisplacementFX;
@@ -56,6 +58,8 @@ package com.cp.sf.worlds
 		
 		protected var occupiedCells:Array;
 		
+		protected var movedToNextFloor:Boolean = false;
+		
 		public function GameWorld() 
 		{
 			super();
@@ -63,7 +67,7 @@ package com.cp.sf.worlds
 		
 		override public function begin():void
 		{
-			GV.floors = 1;
+			GV.floors = 0;
 			GV.kills = 0;
 			
 			ui = new GameUI();
@@ -77,6 +81,11 @@ package com.cp.sf.worlds
 			player = new Player(map.playerStartPosition.x, map.playerStartPosition.y);
 			player.layer = 5;
 			this.add(player);
+			
+			ui.updateHealth(player.health);
+			ui.updateLevel(player.level);
+			ui.updateXp(player.experience);
+			ui.updateFloor(GV.floors);
 			
 			playerHitImage = new FXImage();
 			playerHitEffect = new RGBDisplacementFX();
@@ -116,11 +125,29 @@ package com.cp.sf.worlds
 		
 		override public function update():void
 		{
-			followPlayer();
-			
-			updateEnemyVisibility();
+			if (movedToNextFloor)
+			{
+				initNextFloor();
+			}
+			else
+			{
+				followPlayer();
+				updateEnemyVisibility();
+			}
 			
 			super.update();
+		}
+		
+		public function healPlayer(amount:int):void
+		{
+			player.health += amount;
+			ui.updateHealth(player.health);
+		}
+		
+		public function grantPlayerXp(amount:int):void
+		{
+			player.experience += amount;
+			ui.updateXp(player.experience);
 		}
 		
 		public function occupy(mapX:int, mapY:int, type:String):void
@@ -157,6 +184,7 @@ package com.cp.sf.worlds
 			if (Math.random() <= chance)
 			{
 				player.health -= damage;
+				ui.updateHealth(player.health);
 				
 				if (player.health <= 0) 
 				{
@@ -232,6 +260,75 @@ package com.cp.sf.worlds
 			fadeMusicTween = new VarTween(goToTitle);
 			fadeMusicTween.tween(SoundManager.currentMusic, "volume", 0, 1.5, Ease.quadIn);
 			this.addTween(fadeMusicTween);
+		}
+		
+		public function nextFloor():void
+		{
+			GV.floors += 1;
+			
+			ui.updateFloor(GV.floors);
+			
+			SoundManager.playSound(SoundManager.SFX_STAIRS);
+			
+			this.removeAll();
+			
+			movedToNextFloor = true;
+		}
+		
+		private function initNextFloor():void
+		{
+			movedToNextFloor = false;
+			floorTransition = null;
+			
+			this.add(ui);
+			
+			ui.updateHealth(player.health);
+			ui.updateLevel(player.level);
+			ui.updateXp(player.experience);
+			ui.updateFloor(GV.floors);
+			
+			
+			map = new Map();
+			map.layer = 10;
+			this.add(map);
+			
+			player.x = GC.MAP_CELL_SIZE * map.playerStartPosition.x;
+			player.y = GC.MAP_CELL_SIZE * map.playerStartPosition.y;
+			this.add(player);
+			
+			//this.addGraphic(playerHitImage, -1);
+			
+			minimap = new Minimap(map.mapHeight, map.mapWidth);
+			minimap.layer = 0;
+			this.add(minimap);
+			minimap.visible = false;
+			
+			lighting = new FOV(map);
+			lighting.compute(player.mapX, player.mapY);
+			
+			occupiedCells = new Array(map.mapHeight * map.mapWidth);
+			occupy(player.mapX, player.mapY, player.type);
+			
+			var enemies:Array = new Array();
+			getType(GC.TYPE_ENEMY, enemies);
+			for each (var e:Enemy in enemies)
+			{
+				occupy(e.mapX, e.mapY, e.type);
+			}
+			
+			//this.addGraphic(fadeImage, -20);
+			
+			//fadeIn();
+			
+			floorTransition = new FloorTransition();
+			floorTransition.layer = -1;
+			this.add(floorTransition);
+			player.active = false;
+		}
+		
+		public function floorTranistionDone():void
+		{
+			player.active = true;
 		}
 		
 		private function goToTitle():void

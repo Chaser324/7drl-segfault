@@ -34,8 +34,7 @@ package com.cp.sf
 		public static const MAP_WALL:String = "w";
 		public static const GRANITE:String = "W";
 		
-		public static const MAP_STAIRS_UP:String = "S";
-		public static const MAP_STAIRS_DOWN:String = "s";
+		public static const MAP_STAIRS:String = "s";
 		
 		public static const MAP_DOOR_OPEN:String = "d";
 		public static const MAP_DOOR_CLOSED:String = "D";
